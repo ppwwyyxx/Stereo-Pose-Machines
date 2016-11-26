@@ -7,6 +7,7 @@
 using namespace cv;
 using namespace std;
 using namespace std::this_thread;
+#include "lib/timer.hh"
 
 int main() {
 	Camera c;
@@ -14,9 +15,11 @@ int main() {
 
 	sleep_for(std::chrono::milliseconds(500));
 
-	for (int i = 0; i < 20; ++i) {
-		cv::imwrite("test" + to_string(i) + ".jpg", c.m_cameras[0]);
-		sleep_for(std::chrono::milliseconds(200));
+	for (int i = 0; i < 100; ++i) {
+		// imwrite takes 20ms
+		auto im = c.get(0);
+		cv::imwrite("test" + to_string(i) + ".jpg", im);
+		sleep_for(std::chrono::milliseconds(1000));
 	}
 
 	c.shutdown();

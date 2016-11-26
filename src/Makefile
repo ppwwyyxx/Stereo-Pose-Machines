@@ -13,8 +13,8 @@ else
 	OMP_FLAG=-fopenmp
 endif
 
-#OPTFLAGS ?= -O3 -msse3 -march=native
-OPTFLAGS ?= -g3 -fsanitize=address,undefined -O0
+OPTFLAGS ?= -O3 -msse3 -march=native
+#OPTFLAGS ?= -g3 -fsanitize=address,undefined -O0
 DEFINES = -DDEBUG  	# comment out this line improves speed
 
 # optional extra packages
@@ -60,7 +60,6 @@ $(SO): $(OBJS)
 $(BINS): %.bin: $(OBJS) %.cpp
 	@echo "[bin] $@ ..."
 	@$(CXX) $^ -o $@ $(CXXFLAGS) $(LDFLAGS)
-	@echo "have a nice day! (compiled $@)"
 
 $(OBJ_DIR)/%.o: %.cc
 	@echo "[cc] $< ..."

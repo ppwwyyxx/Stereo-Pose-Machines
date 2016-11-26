@@ -2,13 +2,16 @@
 
 #include "camera.hh"
 
+#include <chrono>
 #include <thread>
+#include "lib/timer.hh"
 #include <pylon/PylonIncludes.h>
 
 using namespace Pylon;
 using namespace std;
 
 const size_t Camera::kMaxCameras;
+const int FrameBuffer::kFrameBufferSize = 10;
 
 void worker(Camera& camera) {
 	CTlFactory& tlFactory = CTlFactory::GetInstance();
@@ -68,7 +71,7 @@ void worker(Camera& camera) {
 			intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
 			int index = cameraContextValue;
 
-			camera.m_cameras[index] = openCVImage;
+			camera.m_camera_buffer[index].write(openCVImage);
 		}
 	} catch (const GenericException &e) {
 		// Error handling
@@ -83,10 +86,25 @@ void Camera::setup() {
 			worker(*this);
 			PylonTerminate();
 	});
+	// wait for the first frame to be ready
+	while (m_camera_buffer[0].empty())
+		this_thread::sleep_for(chrono::milliseconds(300));
 }
 
 
 void Camera::shutdown() {
 	m_stopped = true;
 	m_worker_th.join();
+}
+
+FrameBuffer::FrameBuffer() : frames(kFrameBufferSize) { }
+
+void FrameBuffer::write(cv::Mat mat) {
+	int new_pos = (write_pos + 1) % kFrameBufferSize;
+	frames[new_pos] = mat;
+	write_pos = new_pos;
+}
+
+cv::Mat FrameBuffer::read() const {
+	return frames[write_pos];
 }

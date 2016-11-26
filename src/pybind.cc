@@ -7,7 +7,7 @@ namespace py = pybind11;
 #include "camera.hh"
 
 
-PYBIND11_PLUGIN(example) {
+PYBIND11_PLUGIN(libcpm) {
     py::module m("libcpm", "CPM3D library in C++");
 
     py::class_<Camera>(m, "Camera")
