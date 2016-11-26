@@ -4,7 +4,8 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 	CXX ?= g++
 endif
-INCLUDE_DIR = -I. -isystem $(PYLON_PATH)/include
+INCLUDE_DIR = -I. -isystem $(PYLON_PATH)/include -isystem third_party
+INCLUDE_DIR += $(shell python-config --cflags | cut -d ' ' -f 1)
 
 ifneq (,$(findstring clang,$(CXX)))
 	OMP_FLAG=-fopenmp=libomp
@@ -22,8 +23,10 @@ INCLUDE_DIR += $(shell pkg-config --cflags $(LIBS))
 LDFLAGS += $(shell pkg-config $(LIBS) --libs)
 LDFLAGS += $(shell $(PYLON_PATH)/bin/pylon-config --libs)
 LDFLAGS += $(shell $(PYLON_PATH)/bin/pylon-config --libs-rpath)
+LDFLAGS += $(shell python-config --libs)
 
-CXXFLAGS = $(INCLUDE_DIR) $(OMP_FLAG) -Wall -Wextra
+CXXFLAGS += -fPIC
+CXXFLAGS += $(INCLUDE_DIR) $(OMP_FLAG) -Wall -Wextra
 CXXFLAGS += $(DEFINES) -std=c++11 $(OPTFLAGS)
 CXXFLAGS += -DUSE_GIGE
 
@@ -39,14 +42,20 @@ OBJS = $(addprefix $(OBJ_DIR)/,$(ccSRCS:.cc=.o))
 MAIN_OBJ  := $(addprefix $(OBJ_DIR)/, $(MAIN_SRCS:.cpp=.o))
 DEPS = $(OBJS:.o=.d) $(MAIN_OBJ:.o=.d)
 BINS = $(MAIN_SRCS:.cpp=.bin)
+SO = libcpm.so
 
 .PHONY: all clean run
 
-all: $(BINS)
+all: $(BINS) $(SO)
 
 ifneq ($(MAKECMDGOALS), clean)
 sinclude $(DEPS)
 endif
+
+$(SO): $(OBJS)
+	@echo "[$(SO)] ..."
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -fPIC -shared -o $@
+
 
 $(BINS): %.bin: $(OBJS) %.cpp
 	@echo "[bin] $@ ..."

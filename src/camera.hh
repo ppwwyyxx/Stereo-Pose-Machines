@@ -11,7 +11,6 @@ class Camera {
 		Camera() { }
 
 		void setup();
-
 		void shutdown();
 
 		bool is_stopped() const { return m_stopped; }
@@ -31,7 +30,6 @@ class Camera {
 	protected:
 		std::thread m_worker_th;
 		std::atomic_bool m_stopped{false};
-
 
 };
 

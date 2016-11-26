@@ -1,11 +1,8 @@
 //File: camera.cc
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
-
 
 #include "camera.hh"
 
 #include <thread>
-
 #include <pylon/PylonIncludes.h>
 
 using namespace Pylon;
