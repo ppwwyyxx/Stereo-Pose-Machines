@@ -23,6 +23,7 @@ struct FrameBuffer {
 class Camera {
 	public:
 		Camera() { }
+		~Camera() { shutdown(); }
 
 		void setup();
 		void shutdown();

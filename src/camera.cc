@@ -94,7 +94,8 @@ void Camera::setup() {
 
 void Camera::shutdown() {
 	m_stopped = true;
-	m_worker_th.join();
+	if (m_worker_th.joinable())
+		m_worker_th.join();
 }
 
 FrameBuffer::FrameBuffer() : frames(kFrameBufferSize) { }
