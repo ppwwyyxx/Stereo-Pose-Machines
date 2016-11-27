@@ -11,7 +11,7 @@ struct FrameBuffer {
 	FrameBuffer();
 
 	std::vector<cv::Mat> frames;
-	int write_pos = -1;	// the position last written (always contains valid data)
+  std::atomic_int write_pos{-1};	// the position last written (always contains valid data)
 
 	void write(cv::Mat mat);	// copy mat in to my buffer
 	cv::Mat read() const;	// read latest frame

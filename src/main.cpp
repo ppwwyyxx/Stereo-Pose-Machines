@@ -13,8 +13,6 @@ int main() {
 	Camera c;
 	c.setup();
 
-	sleep_for(std::chrono::milliseconds(500));
-
 	for (int i = 0; i < 100; ++i) {
 		// imwrite takes 20ms
 		auto im = c.get(0);

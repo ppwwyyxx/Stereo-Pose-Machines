@@ -85,7 +85,7 @@ void worker(Camera& camera) {
 			intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
 			int index = cameraContextValue;
 
-			camera.m_camera_buffer[index].write(openCVImage.clone());
+			camera.m_camera_buffer[index].write(openCVImage);
 		}
 	} catch (const GenericException &e) {
 		// Error handling
@@ -116,7 +116,7 @@ FrameBuffer::FrameBuffer() : frames(kFrameBufferSize) { }
 
 void FrameBuffer::write(cv::Mat mat) {
 	int new_pos = (write_pos + 1) % kFrameBufferSize;
-	frames[new_pos] = mat;
+	frames[new_pos] = mat.clone();
 	write_pos = new_pos;
 }
 

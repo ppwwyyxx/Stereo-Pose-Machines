@@ -8,7 +8,6 @@ import time
 import cv2
 import libcpm
 
-#mattype = libcpm.Mat
 camera = libcpm.Camera()
 camera.setup()
 
