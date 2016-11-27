@@ -14,7 +14,7 @@ using namespace std;
 using namespace Basler_UsbCameraParams;
 
 const size_t Camera::kMaxCameras;
-const int FrameBuffer::kFrameBufferSize = 10;
+const int FrameBuffer::kFrameBufferSize = 50;
 
 void worker(Camera& camera) {
 	CTlFactory& tlFactory = CTlFactory::GetInstance();
@@ -36,18 +36,24 @@ void worker(Camera& camera) {
 		if (IsWritable(cameras[i].GainAuto)){
 			cameras[i].GainAuto.SetValue(GainAuto_Off);
 		}
-		// cameras[i].Gain.SetValue(0.0);
+		cameras[i].Gain.SetValue(0.0);
 		cameras[i].BslColorSpaceMode.SetValue(BslColorSpaceMode_RGB);
 		cameras[i].LightSourcePreset.SetValue(LightSourcePreset_Off);
 		cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);
-		cameras[i].ExposureTime.SetValue(50000.0);
+		cameras[i].ExposureTime.SetValue(25000.0);
 		cameras[i].OverlapMode.SetValue(OverlapMode_Off);
 
 		if (i == 0){
 			// Master Camera
+			// cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+			// cameras[i].TriggerMode.SetValue(TriggerMode_Off);
+
 			cameras[i].LineSelector.SetValue(LineSelector_Line2);
+			cameras[i].LineMode.SetValue(LineMode_Output);
 			cameras[i].LineSource.SetValue(LineSource_ExposureActive);
 			cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
+
+
 
 		}else if( i == 1){
 			// Slave Camera
@@ -91,9 +97,7 @@ void worker(Camera& camera) {
 						ptrGrabResult->GetWidth(),
 						CV_8UC3,
 						(uint8_t *)pylonImage.GetBuffer());
-			}
-
-			// When the cameras in the array are created the camera context value
+				// When the cameras in the array are created the camera context value
 			// is set to the index of the camera in the array.
 			// The camera context is a user settable value.
 			// This value is attached to each grab result and can be used
@@ -102,6 +106,9 @@ void worker(Camera& camera) {
 			int index = cameraContextValue;
 
 			camera.m_camera_buffer[index].write(openCVImage);
+			}
+
+			
 		}
 	} catch (const GenericException &e) {
 		// Error handling
