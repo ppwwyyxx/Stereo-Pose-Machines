@@ -6,12 +6,16 @@
 #include <thread>
 #include "lib/timer.hh"
 #include <pylon/PylonIncludes.h>
+#include <pylon/usb/BaslerUsbInstantCameraArray.h>
+
 
 using namespace Pylon;
 using namespace std;
 
 const size_t Camera::kMaxCameras;
 const int FrameBuffer::kFrameBufferSize = 10;
+
+
 
 void worker(Camera& camera) {
 	CTlFactory& tlFactory = CTlFactory::GetInstance();
@@ -22,15 +26,25 @@ void worker(Camera& camera) {
 		throw RUNTIME_EXCEPTION( "No camera present.");
 	}
 
-	CInstantCameraArray cameras(min(devices.size(), Camera::kMaxCameras));
+	CBaslerUsbInstantCameraArray cameras(min(devices.size(), Camera::kMaxCameras));
 
 	// Create and attach all Pylon Devices.
 	for ( size_t i = 0; i < cameras.GetSize(); ++i) {
 		cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
-
+		cameras[i].Open();
+		cameras[i].GainSelector.SetValue(Basler_UsbCameraParams::GainSelector_All);
+		if (IsWritable(cameras[i].GainAuto)){
+			cameras[i].GainAuto.SetValue(Basler_UsbCameraParams::GainAuto_Off);
+		}
+		// cameras[i].Gain.SetValue(0.0);
+		cameras[i].BslColorSpaceMode.SetValue(Basler_UsbCameraParams::BslColorSpaceMode_RGB);
+		cameras[i].LightSourcePreset.SetValue(Basler_UsbCameraParams::LightSourcePreset_Off);
+		cameras[i].ExposureAuto.SetValue(Basler_UsbCameraParams::ExposureAuto_Off);
+		cameras[i].ExposureTime.SetValue(50000.0);
 		// Print the model name of the camera.
 		cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
 	}
+
 
 	// Starts grabbing for all cameras starting with index 0. The grabbing
 	// is started for one camera after the other. That's why the images of all
@@ -71,7 +85,7 @@ void worker(Camera& camera) {
 			intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
 			int index = cameraContextValue;
 
-			camera.m_camera_buffer[index].write(openCVImage);
+			camera.m_camera_buffer[index].write(openCVImage.clone());
 		}
 	} catch (const GenericException &e) {
 		// Error handling
