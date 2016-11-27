@@ -4,18 +4,16 @@
 
 #include <chrono>
 #include <thread>
-#include "lib/timer.hh"
+
 #include <pylon/PylonIncludes.h>
 #include <pylon/usb/BaslerUsbInstantCameraArray.h>
-
+#include "lib/timer.hh"
 
 using namespace Pylon;
 using namespace std;
 
 const size_t Camera::kMaxCameras;
 const int FrameBuffer::kFrameBufferSize = 10;
-
-
 
 void worker(Camera& camera) {
 	CTlFactory& tlFactory = CTlFactory::GetInstance();
@@ -26,7 +24,8 @@ void worker(Camera& camera) {
 		throw RUNTIME_EXCEPTION( "No camera present.");
 	}
 
-	CBaslerUsbInstantCameraArray cameras(min(devices.size(), Camera::kMaxCameras));
+  camera.num_cameras = min(devices.size(), Camera::kMaxCameras);
+	CBaslerUsbInstantCameraArray cameras(camera.num_cameras);
 
 	// Create and attach all Pylon Devices.
 	for ( size_t i = 0; i < cameras.GetSize(); ++i) {
@@ -100,9 +99,13 @@ void Camera::setup() {
 			worker(*this);
 			PylonTerminate();
 	});
-	// wait for the first frame to be ready
-	while (m_camera_buffer[0].empty())
+	// wait for all cameras to be ready
+  while (num_cameras == 0)
 		this_thread::sleep_for(chrono::milliseconds(300));
+  for (int i = 0; i < num_cameras; ++i)
+    while (m_camera_buffer[i].empty())
+      this_thread::sleep_for(chrono::milliseconds(300));
+  cout << "Initialized " << num_cameras << " cameras !" << endl;
 }
 
 
