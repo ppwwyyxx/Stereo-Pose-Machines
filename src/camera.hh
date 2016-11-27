@@ -4,8 +4,8 @@
 #pragma once
 #include <thread>
 #include <atomic>
-#include <opencv2/core/core.hpp>
 #include <vector>
+#include <opencv2/core/core.hpp>
 
 struct FrameBuffer {
 	FrameBuffer();
@@ -44,6 +44,9 @@ class Camera {
 		cv::Mat get(int i) const { return m_camera_buffer[i].read(); }
 
 		FrameBuffer m_camera_buffer[kMaxCameras];
+
+
+    int num_cameras = 0;
 	protected:
 		std::thread m_worker_th;
 		std::atomic_bool m_stopped{false};
