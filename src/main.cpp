@@ -17,7 +17,10 @@ int main() {
 		// imwrite takes 20ms
 		auto im = c.get(0);
 		// cv::imshow("test", im);
-		cv::imwrite("test" + to_string(i) + ".jpg", im);
+		cv::imwrite("./images/test_" + to_string(i) + "_1cam.jpg", im);
+
+		auto im2 = c.get(1);
+		cv::imwrite("./images/test_" + to_string(i) + "_2cam.jpg", im2);
 		sleep_for(std::chrono::milliseconds(1000));
 	}
 

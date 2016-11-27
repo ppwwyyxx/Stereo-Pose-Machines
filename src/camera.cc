@@ -11,6 +11,7 @@
 
 using namespace Pylon;
 using namespace std;
+using namespace Basler_UsbCameraParams;
 
 const size_t Camera::kMaxCameras;
 const int FrameBuffer::kFrameBufferSize = 10;
@@ -32,15 +33,31 @@ void worker(Camera& camera) {
 	for ( size_t i = 0; i < cameras.GetSize(); ++i) {
 		cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
 		cameras[i].Open();
-		cameras[i].GainSelector.SetValue(Basler_UsbCameraParams::GainSelector_All);
+		cameras[i].GainSelector.SetValue(GainSelector_All);
 		if (IsWritable(cameras[i].GainAuto)){
-			cameras[i].GainAuto.SetValue(Basler_UsbCameraParams::GainAuto_Off);
+			cameras[i].GainAuto.SetValue(GainAuto_Off);
 		}
 		// cameras[i].Gain.SetValue(0.0);
-		cameras[i].BslColorSpaceMode.SetValue(Basler_UsbCameraParams::BslColorSpaceMode_RGB);
-		cameras[i].LightSourcePreset.SetValue(Basler_UsbCameraParams::LightSourcePreset_Off);
-		cameras[i].ExposureAuto.SetValue(Basler_UsbCameraParams::ExposureAuto_Off);
+		cameras[i].BslColorSpaceMode.SetValue(BslColorSpaceMode_RGB);
+		cameras[i].LightSourcePreset.SetValue(LightSourcePreset_Off);
+		cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);
 		cameras[i].ExposureTime.SetValue(50000.0);
+		cameras[i].OverlapMode.SetValue(OverlapMode_Off);
+
+		if (i == 0){
+			// Master Camera
+			cameras[i].LineSelector.SetValue(LineSelector_Line2);
+			cameras[i].LineSource.SetValue(LineSource_ExposureActive);
+			cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
+
+		}else if( i == 1){
+			// Slave Camera
+			cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+			cameras[i].TriggerMode.SetValue(TriggerMode_On);
+			cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
+			cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
+		}
+
 		// Print the model name of the camera.
 		cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
 	}
