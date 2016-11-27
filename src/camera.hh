@@ -6,15 +6,18 @@
 #include <atomic>
 #include <vector>
 #include <opencv2/core/core.hpp>
+#include "lib/debugutils.hh"
 
 struct FrameBuffer {
 	FrameBuffer();
 
 	std::vector<cv::Mat> frames;
   std::atomic_int write_pos{-1};	// the position last written (always contains valid data)
+  mutable int last_read_pos{-1};
 
 	void write(cv::Mat mat);	// copy mat in to my buffer
 	cv::Mat read() const;	// read latest frame
+	cv::Mat read_new() const;	// read latest frame not read yet
 
 	bool empty() const { return write_pos < 0; }
 	static const int kFrameBufferSize;
@@ -41,7 +44,14 @@ class Camera {
 		// The bandwidth used by a FireWire camera device can be limited by adjusting the packet size.
 		static const size_t kMaxCameras = 2;
 
-		cv::Mat get(int i) const { return m_camera_buffer[i].read(); }
+		cv::Mat get(int i) const {
+      m_assert(i < num_cameras);
+      return m_camera_buffer[i].read();
+    }
+		cv::Mat get_new(int i) const {
+      m_assert(i < num_cameras);
+      return m_camera_buffer[i].read_new();
+    }
 
 		FrameBuffer m_camera_buffer[kMaxCameras];
 
@@ -50,6 +60,5 @@ class Camera {
 	protected:
 		std::thread m_worker_th;
 		std::atomic_bool m_stopped{false};
-
 };
 

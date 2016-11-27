@@ -108,7 +108,7 @@ void worker(Camera& camera) {
 			camera.m_camera_buffer[index].write(openCVImage);
 			}
 
-			
+
 		}
 	} catch (const GenericException &e) {
 		// Error handling
@@ -118,6 +118,7 @@ void worker(Camera& camera) {
 }
 
 void Camera::setup() {
+  m_assert(!m_worker_th.joinable());
 	m_worker_th = thread([&] {
 			PylonInitialize();
 			worker(*this);
@@ -148,5 +149,11 @@ void FrameBuffer::write(cv::Mat mat) {
 }
 
 cv::Mat FrameBuffer::read() const {
+  last_read_pos = write_pos;
 	return frames[write_pos];
+}
+
+cv::Mat FrameBuffer::read_new() const {
+  while (last_read_pos == write_pos);
+  return read();
 }

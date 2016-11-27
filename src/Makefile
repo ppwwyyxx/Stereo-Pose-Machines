@@ -13,8 +13,8 @@ else
 	OMP_FLAG=-fopenmp
 endif
 
-OPTFLAGS ?= -O3 -msse3 -march=native
-#OPTFLAGS ?= -g3 -fsanitize=address,undefined -O0
+#OPTFLAGS ?= -O3 -msse3 -march=native
+OPTFLAGS ?= -g3 -fsanitize=address,undefined -O0
 DEFINES = -DDEBUG  	# comment out this line improves speed
 
 # optional extra packages
@@ -71,5 +71,5 @@ $(OBJ_DIR)/%.d: %.cc Makefile
 	@$(CXX) $(CXXFLAGS) $(DEFINES) -MM -MT "$(OBJ_DIR)/$(<:.cc=.o) $(OBJ_DIR)/$(<:.cc=.d)" "$<"  > "$@"
 
 clean:
-	@rm -rvf $(OBJ_DIR) $(BINS)
+	@rm -rvf $(OBJ_DIR) $(BINS) $(SO)
 
