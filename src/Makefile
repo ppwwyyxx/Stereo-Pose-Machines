@@ -54,7 +54,7 @@ endif
 
 $(SO): $(OBJS)
 	@echo "[$(SO)] ..."
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -fPIC -shared -o $@
+	@$(CXX) $^ -fPIC -shared -o $@ $(CXXFLAGS) $(LDFLAGS)
 
 $(BINS): %.bin: $(OBJS) %.cpp
 	@echo "[bin] $@ ..."
