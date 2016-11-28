@@ -54,8 +54,6 @@ void StereoCameraViewer::worker() {
     last_duration = now;
     putText(res, ssprintf("FPS:%.1lf", fps), Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.6,
         Scalar(255,255,255), 1);
-    print_debug("FPS: %lf\n", fps);
-
     imshow(winname, res);
   }
   destroyWindow(winname);

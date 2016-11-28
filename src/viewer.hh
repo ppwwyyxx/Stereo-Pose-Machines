@@ -27,5 +27,4 @@ class StereoCameraViewer {
     Timer m_timer;
 
     void worker();
-
 };

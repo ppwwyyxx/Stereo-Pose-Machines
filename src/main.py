@@ -11,10 +11,14 @@ import libcpm
 camera = libcpm.Camera()
 camera.setup()
 
+viewer = libcpm.StereoCameraViewer(camera)
 
-for k in range(50):
-    mat = camera.get(0)
-    arr = np.array(mat, copy=False)
-    cv2.imshow("mat", arr)
-    cv2.waitKey(1)
-    time.sleep(0.1)
+viewer.start()
+time.sleep(5)
+viewer.stop()
+#for k in range(50):
+    #mat = camera.get(0)
+    #arr = np.array(mat, copy=False)
+    #cv2.imshow("mat", arr)
+    #cv2.waitKey(1)
+    #time.sleep(0.1)

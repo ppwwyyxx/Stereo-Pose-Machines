@@ -53,10 +53,8 @@ class Camera {
       return m_camera_buffer[i].read_new();
     }
 
-		FrameBuffer m_camera_buffer[kMaxCameras];
-
-
     int num_cameras = 0;
+		FrameBuffer m_camera_buffer[kMaxCameras];
 	protected:
 		std::thread m_worker_th;
 		std::atomic_bool m_stopped{false};
