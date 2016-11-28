@@ -44,8 +44,8 @@ void StereoCameraViewer::worker() {
   double last_duration = m_timer.duration();
   while (not stopped) {
     auto im0 = m_cam.get_new(0);
-    resize(im0, im0, Size(400,400),0,0,cv::INTER_NEAREST);
     auto im1 = m_cam.get_new(1);
+    resize(im0, im0, Size(400,400),0,0,cv::INTER_NEAREST);
     resize(im1, im1, Size(400,400),0,0,cv::INTER_NEAREST);
     auto res = vconcat(im0, im1);
 

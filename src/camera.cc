@@ -88,8 +88,7 @@ void worker(Camera& camera) {
 
 	try {
 		while (cameras.IsGrabbing() && not camera.is_stopped()) {
-			cameras.RetrieveResult(5000, ptrGrabResult,
-					TimeoutHandling_ThrowException);
+			cameras.RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
 			if (ptrGrabResult->GrabSucceeded()) {
 				formatConverter.Convert(pylonImage, ptrGrabResult);
 				openCVImage = cv::Mat(
@@ -98,17 +97,15 @@ void worker(Camera& camera) {
 						CV_8UC3,
 						(uint8_t *)pylonImage.GetBuffer());
 				// When the cameras in the array are created the camera context value
-			// is set to the index of the camera in the array.
-			// The camera context is a user settable value.
-			// This value is attached to each grab result and can be used
-			// to determine the camera that produced the grab result.
-			intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
-			int index = cameraContextValue;
+        // is set to the index of the camera in the array.
+        // The camera context is a user settable value.
+        // This value is attached to each grab result and can be used
+        // to determine the camera that produced the grab result.
+        intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
+        int index = cameraContextValue;
 
-			camera.m_camera_buffer[index].write(openCVImage);
+        camera.m_camera_buffer[index].write(openCVImage);
 			}
-
-
 		}
 	} catch (const GenericException &e) {
 		// Error handling
@@ -154,6 +151,6 @@ cv::Mat FrameBuffer::read() const {
 }
 
 cv::Mat FrameBuffer::read_new() const {
-  while (last_read_pos == write_pos);
+  while (last_read_pos == write_pos) {};
   return read();
 }
