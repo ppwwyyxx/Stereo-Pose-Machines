@@ -65,7 +65,7 @@ def get_parallel_runner(path):
     cfg = PredictConfig(
         model=Model(),
         session_init=ParamRestore(param_dict),
-        session_config=get_default_sess_config(0.99),
+        session_config=get_default_sess_config(1.0),
         input_names=['input'],
         output_names=['resized_map']
     )

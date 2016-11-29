@@ -72,3 +72,5 @@ $(OBJ_DIR)/%.d: %.cc Makefile
 clean:
 	@rm -rvf $(OBJ_DIR) $(BINS) $(SO)
 
+run: $(BINS)
+	./main.bin

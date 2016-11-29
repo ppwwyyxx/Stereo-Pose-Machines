@@ -24,45 +24,53 @@ void worker(Camera& camera) {
 	CBaslerUsbInstantCameraArray cameras(camera.num_cameras);
 
 	// Create and attach all Pylon Devices.
-	for ( size_t i = 0; i < cameras.GetSize(); ++i) {
-		cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
-		cameras[i].Open();
-		cameras[i].GainSelector.SetValue(GainSelector_All);
-		if (IsWritable(cameras[i].GainAuto)){
-			cameras[i].GainAuto.SetValue(GainAuto_Off);
-		}
-		cameras[i].Gain.SetValue(0.0);
-		cameras[i].BslColorSpaceMode.SetValue(BslColorSpaceMode_RGB);
-		cameras[i].LightSourcePreset.SetValue(LightSourcePreset_Off);
-		cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);
-		cameras[i].ExposureTime.SetValue(25000.0);
-		cameras[i].OverlapMode.SetValue(OverlapMode_Off);
+  try {
+    for ( size_t i = 0; i < cameras.GetSize(); ++i) {
+      cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
+      cameras[i].Open();
+      cameras[i].GainSelector.SetValue(GainSelector_All);
+      if (IsWritable(cameras[i].GainAuto)){
+        cameras[i].GainAuto.SetValue(GainAuto_Off);
+      }
+      cameras[i].ReverseY.SetValue(true);
+      cameras[i].ReverseX.SetValue(true);
+      cameras[i].Gain.SetValue(0.0);
+      cameras[i].BslColorSpaceMode.SetValue(BslColorSpaceMode_RGB);
+      cameras[i].LightSourcePreset.SetValue(LightSourcePreset_Off);
+      cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);
+      cameras[i].ExposureTime.SetValue(25000.0);
+      cameras[i].OverlapMode.SetValue(OverlapMode_Off);
 
-/*
- *    if (i == 0){
- *      // Master Camera
- *      //cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
- *      cameras[i].TriggerMode.SetValue(TriggerMode_Off);
- *
- *      cameras[i].LineSelector.SetValue(LineSelector_Line2);
- *      cameras[i].LineMode.SetValue(LineMode_Output);
- *      cameras[i].LineSource.SetValue(LineSource_ExposureActive);
- *      cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
- *
- *
- *
- *    }else if( i == 1){
- *      // Slave Camera
- *      cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
- *      cameras[i].TriggerMode.SetValue(TriggerMode_On);
- *      cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
- *      cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
- *    }
- */
+  /*
+   *    if (i == 0){
+   *      // Master Camera
+   *      //cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+   *      cameras[i].TriggerMode.SetValue(TriggerMode_Off);
+   *
+   *      cameras[i].LineSelector.SetValue(LineSelector_Line2);
+   *      cameras[i].LineMode.SetValue(LineMode_Output);
+   *      cameras[i].LineSource.SetValue(LineSource_ExposureActive);
+   *      cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
+   *
+   *
+   *
+   *    }else if( i == 1){
+   *      // Slave Camera
+   *      cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+   *      cameras[i].TriggerMode.SetValue(TriggerMode_On);
+   *      cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
+   *      cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
+   *    }
+   */
 
-		// Print the model name of the camera.
-		cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
-	}
+      // Print the model name of the camera.
+      cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
+    }
+  } catch (const GenericException& e) {
+		// Error handling
+		cerr << "Cannot setup cameras! " << endl << e.GetDescription() << endl;
+		exit(1);
+  }
 
 
 	// Starts grabbing for all cameras starting with index 0. The grabbing

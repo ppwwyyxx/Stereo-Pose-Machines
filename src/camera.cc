@@ -23,7 +23,6 @@ cv::Mat Camera::get_for_py(int i) const {
   auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
   m = m(r);
   cv::resize(m, m, cv::Size(368,368));
-  cv::flip(m, m, 1);
   cv::transpose(m,m);
   return m;
 }
