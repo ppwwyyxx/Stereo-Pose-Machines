@@ -6,19 +6,37 @@
 import numpy as np
 import time
 import cv2
+import sys
 import libcpm
+from model import get_runner, colorize
 
-camera = libcpm.Camera()
-camera.setup()
+def test_viewer():
+    # open cameras
+    camera = libcpm.Camera()
+    camera.setup()
+    viewer = libcpm.StereoCameraViewer(camera)
+    viewer.start()
+    time.sleep(100)
+    sys.exit()
 
-viewer = libcpm.StereoCameraViewer(camera)
+if __name__ == '__main__':
 
-viewer.start()
-time.sleep(5)
-viewer.stop()
-#for k in range(50):
-    #mat = camera.get(0)
-    #arr = np.array(mat, copy=False)
-    #cv2.imshow("mat", arr)
-    #cv2.waitKey(1)
-    #time.sleep(0.1)
+    test_viewer()
+
+    camera = libcpm.Camera()
+    camera.setup()
+    cv2.namedWindow('color')
+    cv2.startWindowThread()
+    _, predictor_batch = get_runner('../data/cpm.npy')
+    while True:
+        print time.time()
+        m1 = camera.get_for_py(0)
+        m1 = np.array(m1, copy=False)
+        m2 = camera.get_for_py(1)
+        m2 = np.array(m2, copy=False)
+        out = predictor_batch([m1, m2])
+        #print out.shape
+        c1 = colorize(m1, out[0,:,:,1])
+        #c1 = m1
+        cv2.imshow('color', c1 / 255.0)
+

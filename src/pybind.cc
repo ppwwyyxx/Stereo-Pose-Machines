@@ -27,6 +27,7 @@ PYBIND11_PLUGIN(libcpm) {
       .def("shutdown", &Camera::shutdown)
       .def("get", &Camera::get)
       .def("get_new", &Camera::get_new)
+      .def("get_for_py", &Camera::get_for_py)
       .def_readwrite("num_cameras", &Camera::num_cameras);
 
   py::class_<StereoCameraViewer>(m, "StereoCameraViewer")

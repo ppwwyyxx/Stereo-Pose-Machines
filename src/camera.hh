@@ -48,10 +48,13 @@ class Camera {
       m_assert(i < num_cameras);
       return m_camera_buffer[i].read();
     }
+
 		cv::Mat get_new(int i) const {
       m_assert(i < num_cameras);
       return m_camera_buffer[i].read_new();
     }
+
+    cv::Mat get_for_py(int i) const;
 
     int num_cameras = 0;
 		FrameBuffer m_camera_buffer[kMaxCameras];

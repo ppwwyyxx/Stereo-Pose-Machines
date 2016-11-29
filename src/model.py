@@ -94,6 +94,8 @@ class Model(ModelDesc):
             out4 = add_stage(4, out3)
             out5 = add_stage(5, out4)
             out6 = add_stage(6, out4)
+            resized_map = tf.image.resize_bilinear(out6, [368,368],
+                    name='resized_map')
 
 def run_test(path, input):
     param_dict = np.load(path, encoding='latin1').item()
@@ -121,14 +123,20 @@ def get_runner(path):
     predict_func = OfflinePredictor(PredictConfig(
         model=Model(),
         session_init=ParamRestore(param_dict),
+        session_config=get_default_sess_config(0.99),
         input_names=['input'],
-        output_names=['Mconv7_stage6/output']
+        #output_names=['Mconv7_stage6/output']
+        output_names=['resized_map']
     ))
-    def func(img):
+    def func_single(img):
         # img is bgr, [0,255]
         # return the output in WxHx15
-        return predict_func([[im]])[0][0]
-    return func
+        return predict_func([[img]])[0][0]
+    def func_batch(imgs):
+        # img is bgr, [0,255], nhwc
+        # return the output in nhwc
+        return predict_func([imgs])[0]
+    return func_single, func_batch
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

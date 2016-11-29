@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
   StereoCameraViewer viewer(c);
   viewer.start();
-  sleep_for(std::chrono::seconds(10));
+  sleep_for(std::chrono::seconds(100));
   viewer.stop();
 
 	c.shutdown();

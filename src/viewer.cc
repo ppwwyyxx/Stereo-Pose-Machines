@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "config.hh"
 #include "lib/utils.hh"
 using namespace std;
 using namespace cv;
@@ -45,8 +46,16 @@ void StereoCameraViewer::worker() {
   while (not stopped) {
     auto im0 = m_cam.get_new(0);
     auto im1 = m_cam.get_new(1);
-    resize(im0, im0, Size(400,400),0,0,cv::INTER_NEAREST);
-    resize(im1, im1, Size(400,400),0,0,cv::INTER_NEAREST);
+    resize(im0, im0, Size(VIEWER_W,VIEWER_H),0,0,cv::INTER_NEAREST);
+    resize(im1, im1, Size(VIEWER_W,VIEWER_H),0,0,cv::INTER_NEAREST);
+    flip(im0, im0, 1);
+    flip(im1, im1, 1);
+    cv::rectangle(im0,
+        Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
+        Point(VIEWER_W*CROP_X1,VIEWER_W*CROP_Y1), Scalar(255,255,0));
+    cv::rectangle(im1,
+        Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
+        Point(VIEWER_W*CROP_X1,VIEWER_W*CROP_Y1), Scalar(255,255,0));
     auto res = vconcat(im0, im1);
 
     double now = m_timer.duration();

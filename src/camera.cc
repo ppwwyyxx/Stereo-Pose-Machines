@@ -7,6 +7,7 @@
 
 #include <pylon/PylonIncludes.h>
 #include <pylon/usb/BaslerUsbInstantCameraArray.h>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "lib/timer.hh"
 
 using namespace Pylon;
@@ -43,25 +44,27 @@ void worker(Camera& camera) {
 		cameras[i].ExposureTime.SetValue(25000.0);
 		cameras[i].OverlapMode.SetValue(OverlapMode_Off);
 
-		if (i == 0){
-			// Master Camera
-			// cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
-			// cameras[i].TriggerMode.SetValue(TriggerMode_Off);
-
-			cameras[i].LineSelector.SetValue(LineSelector_Line2);
-			cameras[i].LineMode.SetValue(LineMode_Output);
-			cameras[i].LineSource.SetValue(LineSource_ExposureActive);
-			cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
-
-
-
-		}else if( i == 1){
-			// Slave Camera
-			cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
-			cameras[i].TriggerMode.SetValue(TriggerMode_On);
-			cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
-			cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
-		}
+/*
+ *    if (i == 0){
+ *      // Master Camera
+ *      //cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+ *      cameras[i].TriggerMode.SetValue(TriggerMode_Off);
+ *
+ *      cameras[i].LineSelector.SetValue(LineSelector_Line2);
+ *      cameras[i].LineMode.SetValue(LineMode_Output);
+ *      cameras[i].LineSource.SetValue(LineSource_ExposureActive);
+ *      cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
+ *
+ *
+ *
+ *    }else if( i == 1){
+ *      // Slave Camera
+ *      cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
+ *      cameras[i].TriggerMode.SetValue(TriggerMode_On);
+ *      cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
+ *      cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
+ *    }
+ */
 
 		// Print the model name of the camera.
 		cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
@@ -135,6 +138,17 @@ void Camera::shutdown() {
 	m_stopped = true;
 	if (m_worker_th.joinable())
 		m_worker_th.join();
+}
+
+cv::Mat Camera::get_for_py(int i) const {
+  m_assert(i < num_cameras);
+  auto m = m_camera_buffer[i].read_new();
+  // original size: 1600x1200
+  auto r = cv::Rect(1600*0.25,1200*0.25,800,600);
+  m = m(r);
+  cv::resize(m, m, cv::Size(368,368));
+  cv::flip(m, m, 1);
+  return m;
 }
 
 FrameBuffer::FrameBuffer() : frames(kFrameBufferSize) { }
