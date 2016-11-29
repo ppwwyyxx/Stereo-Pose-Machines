@@ -1,15 +1,14 @@
 //File: camera.cc
 
 #include "camera.hh"
-
-#include <chrono>
-#include <thread>
-
 #include <opencv2/imgproc/imgproc.hpp>
 #include "lib/timer.hh"
+#include "config.hh"
 
 using namespace std;
 
+const size_t Camera::kMaxCameras;
+const int FrameBuffer::kFrameBufferSize = 50;
 
 void Camera::shutdown() {
 	m_stopped = true;
@@ -21,10 +20,11 @@ cv::Mat Camera::get_for_py(int i) const {
   m_assert(i < num_cameras);
   auto m = m_camera_buffer[i].read_new();
   // original size: 1600x1200
-  auto r = cv::Rect(1600*0.25,1200*0.25,800,600);
+  auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
   m = m(r);
   cv::resize(m, m, cv::Size(368,368));
   cv::flip(m, m, 1);
+  cv::transpose(m,m);
   return m;
 }
 

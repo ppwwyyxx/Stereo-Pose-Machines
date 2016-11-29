@@ -24,12 +24,27 @@ cv::Mat vconcat(const cv::Mat& m1, const cv::Mat& m2) {
   memcpy((uchar*)ret.data + sz, m2.data, sz * sizeof(uchar));
 	return ret;
 }
+cv::Mat hconcat(const cv::Mat& m1, const cv::Mat& m2) {
+	int neww = m1.cols << 1;
+	cv::Mat ret(m1.rows, neww, CV_8UC3);
+  uchar* ptr = ret.data;
+  int step = m1.cols * 3;
+  for (int i = 0; i < m1.rows; ++i) {
+    memcpy(ptr, m1.row(i).data, step * sizeof(uchar));
+    ptr += step;
+    memcpy(ptr, m2.row(i).data, step * sizeof(uchar));
+    ptr += step;
+  }
+	return ret;
+}
 
 }
 
 StereoCameraViewer::StereoCameraViewer(const Camera& cam):
   m_cam(cam) {
     m_assert(cam.num_cameras == 2);
+    print_debug("(w,x0,x1)=(%lf,%lf,%lf)\n",CROP_W,CROP_X0,CROP_X1);
+    print_debug("(h,y0,y1)=(%lf,%lf,%lf)\n",CROP_H,CROP_Y0,CROP_Y1);
 }
 
 void StereoCameraViewer::start() {
@@ -48,15 +63,18 @@ void StereoCameraViewer::worker() {
     auto im1 = m_cam.get_new(1);
     resize(im0, im0, Size(VIEWER_W,VIEWER_H),0,0,cv::INTER_NEAREST);
     resize(im1, im1, Size(VIEWER_W,VIEWER_H),0,0,cv::INTER_NEAREST);
-    flip(im0, im0, 1);
-    flip(im1, im1, 1);
+    // TODO set this in camera
     cv::rectangle(im0,
         Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
-        Point(VIEWER_W*CROP_X1,VIEWER_W*CROP_Y1), Scalar(255,255,0));
+        Point(VIEWER_W*CROP_X1,VIEWER_H*CROP_Y1), Scalar(255,255,0));
     cv::rectangle(im1,
         Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
-        Point(VIEWER_W*CROP_X1,VIEWER_W*CROP_Y1), Scalar(255,255,0));
-    auto res = vconcat(im0, im1);
+        Point(VIEWER_W*CROP_X1,VIEWER_H*CROP_Y1), Scalar(255,255,0));
+    flip(im0, im0, 1);
+    flip(im1, im1, 1);
+    transpose(im0,im0);
+    transpose(im1,im1);
+    auto res = hconcat(im0, im1);
 
     double now = m_timer.duration();
     double fps = 1.0 / (now - last_duration);

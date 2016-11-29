@@ -3,9 +3,9 @@
 # File: model.py
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-from __future__ import print_function
 import cv2
 import tensorflow as tf
+import sys
 import numpy as np
 import os, argparse
 
@@ -13,10 +13,9 @@ from tensorpack import *
 from tensorpack.utils.argtools import memoized
 from tensorpack.tfutils.symbolic_functions import *
 from tensorpack.tfutils.summary import *
-from tensorpack.dataflow.dataset import ILSVRCMeta
 import matplotlib.pyplot as plt
 
-__all__ = ['get_runner', 'colorize', 'colorize_all']
+__all__ = ['get_runner', 'colorize', 'colorize_all', 'get_parallel_runner']
 
 _CM = plt.get_cmap('jet')
 def colorize(img, heatmap):
@@ -118,25 +117,6 @@ def run_test(path, input):
         viz = colorize(im, hm_resized)
         cv2.imwrite('part-{:02d}.png'.format(part), viz)
 
-def get_runner(path):
-    param_dict = np.load(path, encoding='latin1').item()
-    predict_func = OfflinePredictor(PredictConfig(
-        model=Model(),
-        session_init=ParamRestore(param_dict),
-        session_config=get_default_sess_config(0.99),
-        input_names=['input'],
-        #output_names=['Mconv7_stage6/output']
-        output_names=['resized_map']
-    ))
-    def func_single(img):
-        # img is bgr, [0,255]
-        # return the output in WxHx15
-        return predict_func([[img]])[0][0]
-    def func_batch(imgs):
-        # img is bgr, [0,255], nhwc
-        # return the output in nhwc
-        return predict_func([imgs])[0]
-    return func_single, func_batch
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

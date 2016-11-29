@@ -5,13 +5,11 @@
 #include <chrono>
 #include <pylon/PylonIncludes.h>
 #include <pylon/usb/BaslerUsbInstantCameraArray.h>
+#include "camera.hh"
+
 using namespace Pylon;
 using namespace Basler_UsbCameraParams;
 using namespace std;
-
-#include "camera.hh"
-const size_t Camera::kMaxCameras;
-const int FrameBuffer::kFrameBufferSize = 50;
 
 void worker(Camera& camera) {
 	CTlFactory& tlFactory = CTlFactory::GetInstance();

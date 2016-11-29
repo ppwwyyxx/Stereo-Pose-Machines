@@ -8,9 +8,10 @@ import time
 import cv2
 import sys
 import libcpm
-from model import get_runner, colorize
+from runner import get_runner, get_parallel_runner
+from model import colorize
 
-def test_viewer():
+def test_cpp_viewer():
     # open cameras
     camera = libcpm.Camera()
     camera.setup()
@@ -19,24 +20,28 @@ def test_viewer():
     time.sleep(100)
     sys.exit()
 
-if __name__ == '__main__':
-
-    test_viewer()
-
+def stereo_cpm_viewer():
     camera = libcpm.Camera()
     camera.setup()
+    runner = get_parallel_runner('../data/cpm.npy')
     cv2.namedWindow('color')
     cv2.startWindowThread()
-    _, predictor_batch = get_runner('../data/cpm.npy')
     while True:
-        print time.time()
         m1 = camera.get_for_py(0)
         m1 = np.array(m1, copy=False)
         m2 = camera.get_for_py(1)
         m2 = np.array(m2, copy=False)
-        out = predictor_batch([m1, m2])
-        #print out.shape
-        c1 = colorize(m1, out[0,:,:,1])
-        #c1 = m1
-        cv2.imshow('color', c1 / 255.0)
+
+        o1, o2 = runner(m1, m2)
+
+        c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
+        c2 = colorize(m1, o1[:,:,:-1].sum(axis=2))
+        viz = np.concatenate((c1, c2), axis=1)
+        cv2.imshow('color', viz / 255.0)
+
+if __name__ == '__main__':
+
+    #test_viewer()
+    stereo_cpm_viewer()
+
 
