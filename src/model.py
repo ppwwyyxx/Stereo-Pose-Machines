@@ -28,6 +28,10 @@ def colorize(img, heatmap):
 def colorize_all(img, heatmaps):
     return [colorize(img, k) for k in heatmaps]
 
+def argmax_2d(heatmap):
+    x = np.argmax(heatmap)
+    return np.unravel_index(x, heatmap.shape[:2])
+
 @memoized
 def get_gaussian_map():
     sigma = 21
@@ -111,11 +115,20 @@ def run_test(path, input):
     im = cv2.imread(input)
     im = cv2.resize(im, (368,368))
     out = predict_func([[im]])[0][0]
+    coords = []
     for part in range(15): # sample 5 body parts: [head, right elbow, left wrist, right ankle, left knee]
         hm = out[:,:,part]
         hm_resized = cv2.resize(hm, (0,0), fx=8, fy=8, interpolation=cv2.INTER_CUBIC)
+        coords.append(argmax_2d(hm))
         viz = colorize(im, hm_resized)
         cv2.imwrite('part-{:02d}.png'.format(part), viz)
+    ptsviz = np.zeros((368,368)).astype('float32') + 255.0
+    coords = np.array(coords, dtype='float32') * 8
+    for c in coords:
+        cv2.circle(ptsviz, tuple(c[::-1]), 8, [0,0,255], -1)
+        #ptsviz[c[0],c[1]] = 1.0
+    ptsviz = ptsviz / 255.0
+    cv2.imwrite('points.png', colorize(im, ptsviz))
 
 
 if __name__ == '__main__':
