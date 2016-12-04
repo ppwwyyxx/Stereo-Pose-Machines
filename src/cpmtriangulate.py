@@ -97,7 +97,7 @@ if __name__ == '__main__':
     #sys.exit()
 
     ret = []
-    for f in sorted(glob.glob('pts2/*.npy')):
+    for f in sorted(glob.glob('../triangulate-data/demo-recording/*.npy')):
         pts = np.load(f)
         print pts.shape
         pts3d = cpmtriangulate(pts)
