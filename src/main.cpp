@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "lib/timer.hh"
+#include "lib/utils.hh"
 #include "camera.hh"
 #include "viewer.hh"
 using namespace cv;
@@ -21,7 +22,14 @@ int main(int argc, char* argv[]) {
 
   StereoCameraViewer viewer(c);
   viewer.start();
-  sleep_for(std::chrono::seconds(100));
+  int cnt = 0;
+  while (true) {
+    cnt ++;
+    auto im0 = c.get_new(0);
+    auto im1 = c.get_new(1);
+    cv::imwrite(ssprintf("images/%03d-0.jpg", cnt), im0);
+    cv::imwrite(ssprintf("images/%03d-1.jpg", cnt), im1);
+  }
   viewer.stop();
 
 	c.shutdown();

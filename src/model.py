@@ -15,7 +15,8 @@ from tensorpack.tfutils.symbolic_functions import *
 from tensorpack.tfutils.summary import *
 import matplotlib.pyplot as plt
 
-__all__ = ['get_runner', 'colorize', 'colorize_all', 'get_parallel_runner']
+__all__ = ['get_runner', 'colorize', 'colorize_all', 'get_parallel_runner',
+        'argmax_2d', 'argmean_2d']
 
 _CM = plt.get_cmap('jet')
 def colorize(img, heatmap):
@@ -31,6 +32,20 @@ def colorize_all(img, heatmaps):
 def argmax_2d(heatmap):
     x = np.argmax(heatmap)
     return np.unravel_index(x, heatmap.shape[:2])
+
+def argmean_2d(heatmap):
+    xs, ys, ws = [], [], []
+    for y in range(heatmap.shape[0]):
+        for x in range(heatmap.shape[1]):
+            if heatmap[y,x] > 0.5:
+                xs.append(x)
+                ys.append(y)
+                ws.append(heatmap[y,x])
+    xs, ys, ws = map(lambda k: np.asarray(k), [xs,ys,ws])
+    s = np.sum(ws)
+    x = np.dot(xs, ws) / s
+    y = np.dot(ys, ws) / s
+    return (y, x)
 
 @memoized
 def get_gaussian_map():

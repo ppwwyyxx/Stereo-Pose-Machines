@@ -64,7 +64,9 @@ void worker(Camera& camera) {
    */
 
       // Print the model name of the camera.
-      cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName() << endl;
+      cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName()
+        << ", " << cameras[i].DeviceSerialNumber.GetValue()
+        << endl;
     }
   } catch (const GenericException& e) {
 		// Error handling

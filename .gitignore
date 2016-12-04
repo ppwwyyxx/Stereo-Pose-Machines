@@ -8,3 +8,5 @@ obj
 __pycache__
 
 *.pyc
+*.png
+*.npy
