@@ -83,6 +83,7 @@ def cpmtriangulate(pts):
     pts3d = []
     for p1, p2 in zip(pts1, pts2):
         p3d = triangulate(c1, c2, p1, p2)
+        exit(0)
         pts3d.append(p3d)
     pts3d = np.array(pts3d)
     return pts3d
@@ -101,7 +102,24 @@ if __name__ == '__main__':
         pts = np.load(f)
         print pts.shape
         pts3d = cpmtriangulate(pts)
+        print pts3d.shape
         ret.append(pts3d)
+
+
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(pts3d[:,0],pts3d[:,1],pts3d[:,2])
+        ax.set_aspect('equal')
+        #plt.axes().set_aspect('equal')
+        plt.show()
+
+        pause()
+
+
     ret = np.array(ret)
 
     np.save('all.npy', ret)

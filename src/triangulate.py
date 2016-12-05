@@ -6,6 +6,7 @@
 import numpy as np
 import sys, os
 import scipy.linalg as la
+import glob
 
 __all__ = ['Camera', 'triangulate', 'read_temple_camera']
 
@@ -44,7 +45,7 @@ def triangulate(cam1, cam2, p1, p2):
     return output
 
 def read_temple_camera():
-    f = open('templeR_par.txt')
+    f = open('./templeRing/templeR_par.txt')
     lines = f.readlines()
     CAM = []
     def parse_21(data):
@@ -52,7 +53,7 @@ def read_temple_camera():
         R = np.asarray(data[9:18]).reshape((3,3))
         t = np.asarray(data[18:])
         return K,R,t
-    for line in [lines[0], lines[2]]:
+    for line in lines:
         line = line.strip().split()[1:]
         line = map(float, line)
         CAM.append(Camera(*parse_21(line)))
@@ -61,14 +62,22 @@ def read_temple_camera():
 if __name__ == '__main__':
 
     CAM = read_temple_camera()
-    pts = np.loadtxt('inlier.txt').astype('float32')
+    print(len(CAM))
+
+    # pts = np.loadtxt('../triangulate-data/inlier-temple.txt').astype('float32')
     pts3d = []
-    print [c.R for c in CAM]
-    for line in pts:
-        print line
-        out = triangulate(CAM[0], CAM[1], line[:2], line[2:])
-        print out
-        pts3d.append(out)
+    # print [c.R for c in CAM]
+    file_list = glob.glob('../temple-inliers/*.txt')
+    # print(file_list)
+    for file in file_list:
+        print file
+        pts = np.loadtxt(file).astype('float32')
+        for line in pts:
+            out = triangulate(CAM[int(file[-9:-7])-1], CAM[int(file[-6:-4])-1], line[:2], line[2:])
+            # print out
+            pts3d.append(out)
+
+
     pts3d = np.asarray(pts3d)
 
 
