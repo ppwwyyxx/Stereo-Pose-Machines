@@ -37,10 +37,10 @@ def stereo_cpm_viewer():
 
         o1, o2 = runner(m1, m2)
 
-        buf = dumps([m1, m2, o1, o2])
-        f = open('recording/{:03d}.npy'.format(cnt), 'w')
-        f.write(buf)
-        f.close()
+        # buf = dumps([m1, m2, o1, o2])
+        # f = open('recording/{:03d}.npy'.format(cnt), 'w')
+        # f.write(buf)
+        # f.close()
 
         c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
         c2 = colorize(m1, o1[:,:,:-1].sum(axis=2))

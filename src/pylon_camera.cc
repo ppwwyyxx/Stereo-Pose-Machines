@@ -40,7 +40,7 @@ void worker(Camera& camera) {
       cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);
       cameras[i].ExposureTime.SetValue(25000.0);
       cameras[i].OverlapMode.SetValue(OverlapMode_Off);
-
+      cameras[i].TriggerMode.SetValue(TriggerMode_Off);
   /*
    *    if (i == 0){
    *      // Master Camera

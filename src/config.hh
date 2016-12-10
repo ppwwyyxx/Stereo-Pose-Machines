@@ -6,7 +6,7 @@
 #define ORIG_W 1600
 #define ORIG_H 1200
 // 0.5 * W
-#define SIZE 0.4
+#define SIZE 0.75
 
 #define CROP_W SIZE
 #define CROP_X0 ((1 - CROP_W) * 0.5)
