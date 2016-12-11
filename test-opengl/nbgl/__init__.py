@@ -81,11 +81,12 @@ class GLDrawer(object):
                     glutIdleFunc(self._gl_drawscene)
                 else:
                     glutIdleFunc(None)
-            glutVisibilityFunc(visible)
             glutKeyboardFunc(self._on_keyboard)
             glutMouseFunc(self._on_mouse)
             glutMotionFunc(self._on_mouse_motion)
             glutReshapeFunc(self._on_reshape)
+            glutVisibilityFunc(visible)
+            glutIdleFunc(self._gl_drawscene)
 
         def init_gl():
             glClearColor(0.0, 0.0, 0.0, 0.0)	# This Will Clear The Background Color To Black

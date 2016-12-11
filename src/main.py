@@ -6,6 +6,7 @@
 import numpy as np
 import time
 import cv2
+import zmq
 import sys
 from collections import deque
 
@@ -95,55 +96,78 @@ def capture_pair():
 def final():
     camera = libcpm.Camera()
     camera.setup()
+
+    pmatcher = libcpm.PatchMatch()
+    pmatcher.init(camera, 20)
+
     #runner = get_parallel_runner('../data/cpm.npy')
     runner, _ = get_runner('../data/cpm.npy')
 
     #cv2.namedWindow('color')
     #cv2.startWindowThread()
-    cnt = 0
-    bgs0, bgs1 = [], []
-    for k in range(20):
-        m1 = camera.get_for_py(0)
-        m1 = np.array(m1, copy=True)
-        m2 = camera.get_for_py(1)
-        m2 = np.array(m2, copy=True)
-        bgs0.append(m1)
-        bgs1.append(m2)
-    matcher = Matcher(BackgroundSegmentor(bgs0), BackgroundSegmentor(bgs1))
+
+    # python matcher:
+    #bgs0, bgs1 = [], []
+    #for k in range(20):
+        #m1 = camera.get_for_py(0)
+        #m1 = np.array(m1, copy=True)
+        #m2 = camera.get_for_py(1)
+        #m2 = np.array(m2, copy=True)
+        #bgs0.append(m1)
+        #bgs1.append(m2)
+    #matcher = Matcher(BackgroundSegmentor(bgs0), BackgroundSegmentor(bgs1))
+
+    viewer = libcpm.StereoCameraViewer(camera)
+    viewer.start()
 
     C1, C0, d1, d0 = load_camera_from_calibr('../calibr-1211/camchain-homeyihuaDesktopCPM3D_kalibrfinal3.yaml')
     queue = deque(maxlen=10)
 
+    ctx = zmq.Context()
+    sok = ctx.socket(zmq.PUSH)
+    sok.connect('tcp://172.22.45.86:8888')
+
+    def cpp_matcher(m1, m2, o1, o2):
+        o1 = libcpm.Mat(o1)
+        o2 = libcpm.Mat(o2)
+        out = pmatcher.match_with_hm(m1, m2, o1, o2)
+        return np.asarray(out).reshape(14, 4) #14 x 2image x (x,y)
 
     pts3ds = []
     while True:
-        cnt += 1
+        print 'begin---', time.time()
         m1 = camera.get_for_py(0)
-        m1 = np.array(m1, copy=False)
+        m1r = np.array(m1, copy=False)
         m2 = camera.get_for_py(1)
-        m2 = np.array(m2, copy=False)
+        m2r = np.array(m2, copy=False)
 
-        smallm1 = cv2.resize(m1, (368,368))
-        smallm2 = cv2.resize(m2, (368,368))
+        m1s = cv2.resize(m1r, (368,368))
+        m2s = cv2.resize(m2r, (368,368))
+        print 'after resize---', time.time()
 
         #o1, o2 = runner(m1, m2)
-        o1 = runner(smallm1)
-        o2 = runner(smallm2)
+        o1 = runner(m1s)
+        o2 = runner(m2s)
+        print 'after cpm---', time.time()
 
-        pts14x4 = matcher.match(m1, m2, o1, o2)
+        #pts14x4 = matcher.match(m1r, m2r, o1, o2)
+        pts14x4 = cpp_matcher(m1, m2, o1, o2)
+
+        print 'after match---', time.time()
         queue.append(pts14x4)
         p2d = np.mean(queue, axis=0)
         p3ds = np.zeros((14,3))
         for c in range(14):
             p3d = triangulate(C0, C1, p2d[c,:2], p2d[c,2:])
             p3ds[c,:] = p3d
-        pts3ds.append(p3ds)
-        np.save('p3d.npy', np.array(pts3ds))
+        sok.send(dumps(p3ds))
+        print 'after send---', time.time()
+        print '-------'
 
-        c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
-        c2 = colorize(m2, o2[:,:,:-1].sum(axis=2))
-        viz = np.concatenate((c1, c2), axis=1)
-        cv2.imshow('color', viz / 255.0)
+        #c1 = colorize(m1r, o1[:,:,:-1].sum(axis=2))
+        #c2 = colorize(m2r, o2[:,:,:-1].sum(axis=2))
+        #viz = np.concatenate((c1, c2), axis=1)
+        #cv2.imshow('color', viz / 255.0)
 
 if __name__ == '__main__':
     final()

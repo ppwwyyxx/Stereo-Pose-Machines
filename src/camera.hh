@@ -4,6 +4,7 @@
 #pragma once
 #include <thread>
 #include <atomic>
+#include <memory>
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include "lib/debugutils.hh"
@@ -56,7 +57,7 @@ class Camera {
       return m_camera_buffer[i].read_new();
     }
 
-    cv::Mat get_for_calibrate(int i) const {
+    cv::Mat get_cropped(int i) const {
       static auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
       auto m = get_new(i);
       m = m(r).clone();

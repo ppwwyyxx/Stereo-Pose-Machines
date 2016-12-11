@@ -8,6 +8,7 @@ import sys, os, cv2, glob
 import numpy as np
 import numpy.matlib
 from collections import deque
+import zmq
 
 from model import argmax_2d
 from background import BackgroundSegmentor
@@ -79,7 +80,6 @@ class Matcher():
             target = take_patch(im0, y0, x0, PATCH_SIZE)
             region = take_patch(im1, y1, x1, REGION_SIZE)
 
-
             res = cv2.matchTemplate(region, target, cv2.TM_CCOEFF_NORMED)
             _, _, _, top_left = cv2.minMaxLoc(res)
             top_left = top_left[::-1]
@@ -122,7 +122,7 @@ if __name__ == '__main__':
             for k in range(1,21)]
     BG1 = BackgroundSegmentor(bgs)
 
-    pts = []
+    #pts = []
     q = deque(maxlen=10)
 
     for idx, k in enumerate(sorted(
@@ -142,7 +142,8 @@ if __name__ == '__main__':
         viz, pts14 = test_match(im0, im1, hm0, hm1)  #14x4
         cv2.imwrite("./{}/viz/{}.jpg".format(recording_dir, num), viz)
         q.append(pts14)
-        pts.append(np.mean(list(q), axis=0))
+        pts2send = np.mean(list(q), axis=0)
+        #pts.append(np.mean(list(q), axis=0))
     out = np.array(pts)
     out = out.transpose(1,2,0)
     print out.shape

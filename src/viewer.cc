@@ -16,14 +16,6 @@ namespace {
 const string winname = "viz";
 
 // only works for 8UC3
-cv::Mat vconcat(const cv::Mat& m1, const cv::Mat& m2) {
-	int newh = m1.rows << 1;
-	cv::Mat ret(newh, m1.cols, CV_8UC3);
-  int sz = m1.rows * m1.cols * 3;
-	memcpy(ret.data, m1.data, sz * sizeof(uchar));
-  memcpy((uchar*)ret.data + sz, m2.data, sz * sizeof(uchar));
-	return ret;
-}
 cv::Mat hconcat(const cv::Mat& m1, const cv::Mat& m2) {
 	int neww = m1.cols << 1;
 	cv::Mat ret(m1.rows, neww, CV_8UC3);
@@ -55,6 +47,7 @@ void StereoCameraViewer::start() {
 
 void StereoCameraViewer::worker() {
   namedWindow(winname);
+  namedWindow("");
   startWindowThread();
   m_timer.restart();
   double last_duration = m_timer.duration();
@@ -70,8 +63,6 @@ void StereoCameraViewer::worker() {
     cv::rectangle(im1,
         Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
         Point(VIEWER_W*CROP_X1,VIEWER_H*CROP_Y1), Scalar(255,255,0));
-    //transpose(im0,im0);
-    //transpose(im1,im1)"
     auto res = hconcat(im0, im1);
 
     double now = m_timer.duration();

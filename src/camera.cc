@@ -2,10 +2,12 @@
 
 #include "camera.hh"
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "lib/timer.hh"
 #include "config.hh"
 
 using namespace std;
+using namespace cv;
 
 const size_t Camera::kMaxCameras;
 const int FrameBuffer::kFrameBufferSize = 50;
@@ -30,14 +32,14 @@ cv::Mat Camera::get_for_py(int i) const {
 FrameBuffer::FrameBuffer() : frames(kFrameBufferSize) { }
 
 void FrameBuffer::write(cv::Mat mat) {
-	int new_pos = (write_pos + 1) % kFrameBufferSize;
-	frames[new_pos] = mat.clone();
-	write_pos = new_pos;
+  int new_pos = (write_pos + 1) % kFrameBufferSize;
+  frames[new_pos] = mat.clone();
+  write_pos = new_pos;
 }
 
 cv::Mat FrameBuffer::read() const {
   last_read_pos = write_pos;
-	return frames[write_pos];
+  return frames[write_pos];
 }
 
 cv::Mat FrameBuffer::read_new() const {

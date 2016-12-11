@@ -30,8 +30,8 @@ def colorize_all(img, heatmaps):
     return [colorize(img, k) for k in heatmaps]
 
 def argmax_2d(heatmap):
-    x = np.argmax(heatmap)
-    return np.unravel_index(x, heatmap.shape[:2])
+    _, _, _, top_left = cv2.minMaxLoc(heatmap)
+    return top_left[::-1]
 
 def argmean_2d(heatmap):
     xs, ys, ws = [], [], []
@@ -114,6 +114,7 @@ class Model(ModelDesc):
             out4 = add_stage(4, out3)
             out5 = add_stage(5, out4)
             out6 = add_stage(6, out4)
+            out6 = tf.slice(out6, [0,0,0,0], [-1,-1,-1,14])
             resized_map = tf.image.resize_bilinear(out6,
                     [640,640],
                     name='resized_map')

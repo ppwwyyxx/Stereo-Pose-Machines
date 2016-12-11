@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <sstream>
 #include <pylon/PylonIncludes.h>
 #include <pylon/usb/BaslerUsbInstantCameraArray.h>
 #include "camera.hh"
@@ -23,6 +24,8 @@ void worker(Camera& camera) {
   camera.num_cameras = min(devices.size(), Camera::kMaxCameras);
 	CBaslerUsbInstantCameraArray cameras(camera.num_cameras);
 
+  bool rev = false;
+
 	// Create and attach all Pylon Devices.
   try {
     for ( size_t i = 0; i < cameras.GetSize(); ++i) {
@@ -41,30 +44,8 @@ void worker(Camera& camera) {
       cameras[i].ExposureTime.SetValue(25000.0);
       cameras[i].OverlapMode.SetValue(OverlapMode_Off);
 
-  /*
-   *    if (i == 0){
-   *      // Master Camera
-   *      //cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
-   *      cameras[i].TriggerMode.SetValue(TriggerMode_Off);
-   *
-   *      cameras[i].LineSelector.SetValue(LineSelector_Line2);
-   *      cameras[i].LineMode.SetValue(LineMode_Output);
-   *      cameras[i].LineSource.SetValue(LineSource_ExposureActive);
-   *      cameras[i].UserOutputSelector.SetValue(UserOutputSelector_UserOutput2);
-   *
-   *
-   *
-   *    }else if( i == 1){
-   *      // Slave Camera
-   *      cameras[i].TriggerSelector.SetValue(TriggerSelector_FrameStart);
-   *      cameras[i].TriggerMode.SetValue(TriggerMode_On);
-   *      cameras[i].TriggerSource.SetValue(TriggerSource_Line2);
-   *      cameras[i].TriggerActivation.SetValue(TriggerActivation_RisingEdge);
-   *    }
-   */
-
       // Print the model name of the camera.
-      cout << "Using device " << cameras[i].GetDeviceInfo().GetModelName()
+      cout << "Using device " << i << ": " << cameras[i].GetDeviceInfo().GetModelName()
         << ", " << cameras[i].DeviceSerialNumber.GetValue()
         << endl;
     }
@@ -73,6 +54,12 @@ void worker(Camera& camera) {
 		cerr << "Cannot setup cameras! " << endl << e.GetDescription() << endl;
 		exit(1);
   }
+  ostringstream ss;
+  ss << cameras[0].DeviceSerialNumber.GetValue();
+  string serial1 = ss.str();
+  if (serial1.find("711") == string::npos)  // 711 should be the first camera
+    rev = true;
+  cout << "Reverse camera order: " << rev << endl;
 
 
 	// Starts grabbing for all cameras starting with index 0. The grabbing
@@ -109,7 +96,7 @@ void worker(Camera& camera) {
         // This value is attached to each grab result and can be used
         // to determine the camera that produced the grab result.
         intptr_t cameraContextValue = ptrGrabResult->GetCameraContext();
-        int index = cameraContextValue;
+        int index = rev ? 1 - cameraContextValue : cameraContextValue;
 
         camera.m_camera_buffer[index].write(openCVImage);
 			}
