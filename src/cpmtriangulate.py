@@ -8,6 +8,7 @@ import glob
 import cv2
 import os
 from triangulate import *
+from calibr import load_camera_from_calibr
 
 def coordinate_recover(p):
     y, x = p[0], p[1]
@@ -87,6 +88,18 @@ def cpmtriangulate(pts):
     pts3d = np.array(pts3d)
     return pts3d
 
+def test_mean_smooth(pts):
+    C0, C1, d0, d1 = load_camera_from_calibr('../calibr-1210/camchain-final2.yaml')
+    pts3d = []
+    for k in range(14):
+        p0 = pts[k,:2]
+        p1 = pts[k,2:]
+        p3d = triangulate(C0, C1, p0, p1)
+        pts3d.append(p3d)
+    pts3d = np.array(pts3d)
+    return pts3d
+
+
 if __name__ == '__main__':
     #pts = np.loadtxt('inlier-12.txt').reshape(-1,2,2)
     #pts = np.load('pts3.npy')
@@ -96,12 +109,25 @@ if __name__ == '__main__':
     #viz3d(pts3d)
     #sys.exit()
 
-    ret = []
-    for f in sorted(glob.glob('../triangulate-data/demo-recording/*.npy')):
-        pts = np.load(f)
-        print pts.shape
-        pts3d = cpmtriangulate(pts)
-        ret.append(pts3d)
-    ret = np.array(ret)
+    # ----------
+    #ret = []
+    #for f in sorted(glob.glob('../triangulate-data/demo-recording/*.npy')):
+        #pts = np.load(f)
+        #print pts.shape
+        #pts3d = cpmtriangulate(pts)
+        #ret.append(pts3d)
+    #ret = np.array(ret)
 
+    #np.save('all.npy', ret)
+    # ------------
+
+    pts = np.load('../data/mean-smooth.npy')
+    ret = []
+    N = pts.shape[-1]
+    for k in range(N):
+        ret.append(test_mean_smooth(pts[:,:,k]))
+    ret = np.array(ret)
     np.save('all.npy', ret)
+    import IPython;
+    IPython.embed(config=IPython.terminal.ipapp.load_default_config())
+
