@@ -4,7 +4,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 	CXX ?= g++
 endif
-INCLUDE_DIR = -I. -isystem $(PYLON_PATH)/include -isystem third_party
+INCLUDE_DIR = -I. -isystem $(PYLON_PATH)/include -isystem third_party -isystem /usr/include/eigen3
 INCLUDE_DIR += $(shell python-config --cflags | cut -d ' ' -f 1)
 
 ifneq (,$(findstring clang,$(CXX)))

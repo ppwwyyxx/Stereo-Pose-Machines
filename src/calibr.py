@@ -29,11 +29,12 @@ def load_camera_from_calibr(f):
     return C0, C1, dist0, dist1
 
 if __name__ == '__main__':
-    C0, C1, d0, d1 = load_camera_from_calibr('./camchain-final2.yaml')
-    im = cv2.imread('../src/images/cam0/00029-0.jpg')
+    C0, C1, d0, d1 = load_camera_from_calibr('../calibr-1211/camchain-homeyihuaDesktopCPM3D_kalibrfinal3.yaml')
+    im = cv2.imread('calibrate-image-3/cam0/0012100000000000000.jpg')
+    print im is None
 
-    for k in tqdm.trange(300):
-        und = cv2.undistort(im, C0.K, d0)
+    #for k in tqdm.trange(300):
+    und = cv2.undistort(im, C0.K, d0)
 
 
     cv2.imwrite("orig.png", im)

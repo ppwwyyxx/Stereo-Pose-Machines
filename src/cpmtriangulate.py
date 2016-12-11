@@ -89,11 +89,13 @@ def cpmtriangulate(pts):
     return pts3d
 
 def test_mean_smooth(pts):
-    C0, C1, d0, d1 = load_camera_from_calibr('../calibr-1210/camchain-final2.yaml')
+    #factor = 640 / 368.0
+    C0, C1, d0, d1 = load_camera_from_calibr('../calibr-1211/camchain-homeyihuaDesktopCPM3D_kalibrfinal3.yaml')
     pts3d = []
     for k in range(14):
         p0 = pts[k,:2]
         p1 = pts[k,2:]
+        p0, p1 = p1, p0
         p3d = triangulate(C0, C1, p0, p1)
         pts3d.append(p3d)
     pts3d = np.array(pts3d)
@@ -121,13 +123,11 @@ if __name__ == '__main__':
     #np.save('all.npy', ret)
     # ------------
 
-    pts = np.load('../data/mean-smooth.npy')
+    pts = np.load('../data/pm-pts.npy')
     ret = []
     N = pts.shape[-1]
     for k in range(N):
         ret.append(test_mean_smooth(pts[:,:,k]))
     ret = np.array(ret)
     np.save('all.npy', ret)
-    import IPython;
-    IPython.embed(config=IPython.terminal.ipapp.load_default_config())
 

@@ -32,9 +32,9 @@ void worker(Camera& camera) {
       if (IsWritable(cameras[i].GainAuto)){
         cameras[i].GainAuto.SetValue(GainAuto_Off);
       }
-      cameras[i].ReverseY.SetValue(false);
+      cameras[i].ReverseY.SetValue(true);
       cameras[i].ReverseX.SetValue(true);
-      cameras[i].Gain.SetValue(7.0);
+      cameras[i].Gain.SetValue(6.0);
       cameras[i].BslColorSpaceMode.SetValue(BslColorSpaceMode_RGB);
       cameras[i].LightSourcePreset.SetValue(LightSourcePreset_Off);
       cameras[i].ExposureAuto.SetValue(ExposureAuto_Off);

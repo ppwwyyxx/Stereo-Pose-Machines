@@ -7,10 +7,16 @@ import numpy as np
 import time
 import cv2
 import sys
+from collections import deque
+
 import libcpm
 from runner import get_runner, get_parallel_runner
 from model import colorize, argmax_2d
 from tensorpack.utils.serialize import dumps
+from triangulate import triangulate
+from calibr import load_camera_from_calibr
+from background import BackgroundSegmentor
+from patchmatch import Matcher
 
 def test_cpp_viewer():
     # open cameras
@@ -24,7 +30,8 @@ def test_cpp_viewer():
 def stereo_cpm_viewer():
     camera = libcpm.Camera()
     camera.setup()
-    runner = get_parallel_runner('../data/cpm.npy')
+    #runner = get_parallel_runner('../data/cpm.npy')
+    runner, _ = get_runner('../data/cpm.npy')
     cv2.namedWindow('color')
     cv2.startWindowThread()
     cnt = 0
@@ -35,7 +42,9 @@ def stereo_cpm_viewer():
         m2 = camera.get_for_py(1)
         m2 = np.array(m2, copy=False)
 
-        o1, o2 = runner(m1, m2)
+        #o1, o2 = runner(m1, m2)
+        o1 = runner(m1)
+        o2 = runner(m2)
 
         buf = dumps([m1, m2, o1, o2])
         f = open('recording/{:03d}.npy'.format(cnt), 'w')
@@ -43,7 +52,7 @@ def stereo_cpm_viewer():
         f.close()
 
         c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
-        c2 = colorize(m1, o1[:,:,:-1].sum(axis=2))
+        c2 = colorize(m2, o2[:,:,:-1].sum(axis=2))
         viz = np.concatenate((c1, c2), axis=1)
         cv2.imshow('color', viz / 255.0)
 
@@ -83,10 +92,64 @@ def capture_pair():
     cv2.imwrite("2.png", im2)
 
 
+def final():
+    camera = libcpm.Camera()
+    camera.setup()
+    #runner = get_parallel_runner('../data/cpm.npy')
+    runner, _ = get_runner('../data/cpm.npy')
+
+    #cv2.namedWindow('color')
+    #cv2.startWindowThread()
+    cnt = 0
+    bgs0, bgs1 = [], []
+    for k in range(20):
+        m1 = camera.get_for_py(0)
+        m1 = np.array(m1, copy=True)
+        m2 = camera.get_for_py(1)
+        m2 = np.array(m2, copy=True)
+        bgs0.append(m1)
+        bgs1.append(m2)
+    matcher = Matcher(BackgroundSegmentor(bgs0), BackgroundSegmentor(bgs1))
+
+    C1, C0, d1, d0 = load_camera_from_calibr('../calibr-1211/camchain-homeyihuaDesktopCPM3D_kalibrfinal3.yaml')
+    queue = deque(maxlen=10)
+
+
+    pts3ds = []
+    while True:
+        cnt += 1
+        m1 = camera.get_for_py(0)
+        m1 = np.array(m1, copy=False)
+        m2 = camera.get_for_py(1)
+        m2 = np.array(m2, copy=False)
+
+        smallm1 = cv2.resize(m1, (368,368))
+        smallm2 = cv2.resize(m2, (368,368))
+
+        #o1, o2 = runner(m1, m2)
+        o1 = runner(smallm1)
+        o2 = runner(smallm2)
+
+        pts14x4 = matcher.match(m1, m2, o1, o2)
+        queue.append(pts14x4)
+        p2d = np.mean(queue, axis=0)
+        p3ds = np.zeros((14,3))
+        for c in range(14):
+            p3d = triangulate(C0, C1, p2d[c,:2], p2d[c,2:])
+            p3ds[c,:] = p3d
+        pts3ds.append(p3ds)
+        np.save('p3d.npy', np.array(pts3ds))
+
+        c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
+        c2 = colorize(m2, o2[:,:,:-1].sum(axis=2))
+        viz = np.concatenate((c1, c2), axis=1)
+        cv2.imshow('color', viz / 255.0)
+
 if __name__ == '__main__':
+    final()
 
     #test_viewer()
-    stereo_cpm_viewer()
+    #stereo_cpm_viewer()
     #dump_2dcoor()
     #capture_pair()
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include "lib/debugutils.hh"
+#include "undistort.hh"
 #include "config.hh"
 
 struct FrameBuffer {
@@ -59,7 +60,7 @@ class Camera {
       static auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
       auto m = get_new(i);
       m = m(r).clone();
-      cv::transpose(m, m);
+      //cv::transpose(m, m);
       return m;
     }
 
@@ -70,5 +71,16 @@ class Camera {
 	protected:
 		std::thread m_worker_th;
 		std::atomic_bool m_stopped{false};
+
+    UnDistorter und[2] = {
+    {
+      std::vector<float>{497.34523030669726, 498.6252539240636, 336.6619041360677, 330.591363588999},
+      std::vector<float>{-0.3103134183039186, 0.09095606802142354, -0.00014587966139778565, 1.6673554459116872e-05}
+    },
+    {
+      std::vector<float>{496.83022163524873, 499.41346338573675, 325.02654861341205, 304.68513534512397},
+      std::vector<float>{-0.30985074204714164, 0.094934997317346, 3.982649654984981e-05, 0.00044156773483151505}
+    }
+    };
 };
 

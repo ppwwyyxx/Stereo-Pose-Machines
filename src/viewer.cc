@@ -70,8 +70,8 @@ void StereoCameraViewer::worker() {
     cv::rectangle(im1,
         Point(VIEWER_W*CROP_X0,VIEWER_H*CROP_Y0),
         Point(VIEWER_W*CROP_X1,VIEWER_H*CROP_Y1), Scalar(255,255,0));
-    transpose(im0,im0);
-    transpose(im1,im1);
+    //transpose(im0,im0);
+    //transpose(im1,im1)"
     auto res = hconcat(im0, im1);
 
     double now = m_timer.duration();

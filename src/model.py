@@ -114,7 +114,8 @@ class Model(ModelDesc):
             out4 = add_stage(4, out3)
             out5 = add_stage(5, out4)
             out6 = add_stage(6, out4)
-            resized_map = tf.image.resize_bilinear(out6, [368,368],
+            resized_map = tf.image.resize_bilinear(out6,
+                    [640,640],
                     name='resized_map')
 
 def run_test(path, input):

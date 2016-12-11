@@ -15,15 +15,27 @@ class BackgroundSegmentor():
             bgim = [bgim]
         bgim = np.asarray(bgim)
         self.bgim = bgim.mean(axis=0).astype('float32')
-        self.kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (2,2))
+        self.kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+        self.dilate_k =  cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
 
     def segment(self, im):
         mask = np.square(im.astype('float32') - self.bgim
                 ).sum(axis=2) / 20
         mask = np.clip(mask, 0, 255).astype('uint8')
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel)
-        return (mask > 40).astype('float32') *255
-        return mask.astype('float32') * 255
+        mask = cv2.dilate(mask, self.dilate_k)
+        mask = mask.astype('uint8')
+
+        #flags = 8 | cv2.FLOODFILL_FIXED_RANGE
+        #bfsmask = np.zeros((mask.shape[0]+2,mask.shape[1]+2), dtype='uint8')
+        #cv2.floodFill(mask, bfsmask, (20,20), 100, 5,5, flags)
+        #cv2.floodFill(mask, bfsmask, (mask.shape[0]-20,mask.shape[1]-20), 100, 5,5, flags)
+        #cv2.floodFill(mask, bfsmask, (mask.shape[0]-20,20), 100, 5,5, flags)
+        #cv2.floodFill(mask, bfsmask, (20,mask.shape[1]-20), 100, 5,5, flags)
+        #mask = cv2.dilate(mask, self.dilate_k)
+        #return mask.astype('float32')
+        return (mask > 10).astype('float32') *255
+        #return mask.astype('float32') * 255
 
 
 if __name__ == '__main__':
