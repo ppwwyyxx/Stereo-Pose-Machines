@@ -36,10 +36,18 @@ class Frame(object):
 def build_cylinder_from_3dpts(pts):
     ret = []
 
-    def f(id1, id2):
-        return Cylinder(pts[id1,:],pts[id2,:], 3)
+    def f(id1, id2, thick):
+        return Cylinder(pts[id1,:],pts[id2,:], thick)
 
-    ret.append(f(0,1))
+    ret.append(f(0,1, 3))
+    ret.append(f(2,3,1))
+    ret.append(f(3,4,1))
+    ret.append(f(5,6,1))
+    ret.append(f(6,7,1))
+    ret.append(f(8,9,1))
+    ret.append(f(9,10,1))
+    ret.append(f(11,12,1))
+    ret.append(f(12,13,1))
     return ret
 
 f = Frame([], [Cylinder([10,10,1],[20,20,2], 3)])
@@ -83,7 +91,7 @@ if __name__ == '__main__':
         global cnt
         cnt += 1
         step = cnt / 5
-        print step
+        print step % alldata.shape[0]
         data = alldata[step%alldata.shape[0]] * 100
         spheres = [Sphere(3, pos) for pos in data]
         cyls = build_cylinder_from_3dpts(data)
