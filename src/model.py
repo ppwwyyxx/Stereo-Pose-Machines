@@ -43,8 +43,12 @@ def argmean_2d(heatmap):
                 ws.append(heatmap[y,x])
     xs, ys, ws = map(lambda k: np.asarray(k), [xs,ys,ws])
     s = np.sum(ws)
+    if s == 0:
+        return (0,0,0)
     x = np.dot(xs, ws) / s
     y = np.dot(ys, ws) / s
+    print s,x,y
+
     return (y, x)
 
 @memoized
