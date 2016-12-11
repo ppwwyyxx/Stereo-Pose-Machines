@@ -15,7 +15,7 @@ from tensorpack.tfutils.symbolic_functions import *
 from tensorpack.tfutils.summary import *
 import matplotlib.pyplot as plt
 
-__all__ = ['get_runner', 'colorize', 'colorize_all', 'get_parallel_runner',
+__all__ = ['colorize', 'colorize_all',
         'argmax_2d', 'argmean_2d']
 
 _CM = plt.get_cmap('jet')
@@ -128,7 +128,7 @@ def run_test(path, input):
     #for k in tqdm.range(20):
     #im = cv2.imread('cpmtest.jpg')
     im = cv2.imread(input)
-    im = cv2.resize(im, (368,368))
+    im = cv2.resize(im, (368,368))  # input bgr image
     out = predict_func([[im]])[0][0]
     coords = []
     for part in range(15): # sample 5 body parts: [head, right elbow, left wrist, right ankle, left knee]

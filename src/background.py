@@ -3,6 +3,7 @@
 # File: background.py
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
+import sys
 import numpy as np
 import glob
 import cv2
@@ -26,11 +27,12 @@ class BackgroundSegmentor():
 
 
 if __name__ == '__main__':
-    bgs = [cv2.imread('./eric-background-test/cam0/000{:02d}-0.jpg'.format(k))
+    recording_dir = sys.argv[1]
+    bgs = [cv2.imread('./{}/cam0/000{:02d}-0.jpg'.format(recording_dir, k))
             for k in range(1,21)]
     b = BackgroundSegmentor(bgs)
 
-    for v in sorted(glob.glob('./eric-background-test/cam0/*.jpg')):
+    for v in sorted(glob.glob('./{}/cam0/*.jpg'.format(recording_dir))):
         im = cv2.imread(v)
         seg = b.segment(im)
         seg = seg.astype('uint8')
