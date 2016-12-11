@@ -7,6 +7,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include "lib/debugutils.hh"
+#include "config.hh"
 
 struct FrameBuffer {
 	FrameBuffer();
@@ -52,6 +53,14 @@ class Camera {
 		cv::Mat get_new(int i) const {
       m_assert(i < num_cameras);
       return m_camera_buffer[i].read_new();
+    }
+
+    cv::Mat get_for_calibrate(int i) const {
+      static auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
+      auto m = get_new(i);
+      m = m(r).clone();
+      cv::transpose(m, m);
+      return m;
     }
 
     cv::Mat get_for_py(int i) const;

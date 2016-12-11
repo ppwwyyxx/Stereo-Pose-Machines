@@ -8,11 +8,13 @@
 #include "lib/utils.hh"
 #include "camera.hh"
 #include "viewer.hh"
+#include "config.hh"
 using namespace cv;
 using namespace std;
 using namespace std::this_thread;
 
 int main(int argc, char* argv[]) {
+
 	Camera c;
 	c.setup();
   if (argc == 2) {
@@ -25,10 +27,10 @@ int main(int argc, char* argv[]) {
   int cnt = 0;
   while (true) {
     cnt ++;
-    auto im0 = c.get_new(0);
-    auto im1 = c.get_new(1);
-    cv::imwrite(ssprintf("images/%03d-0.jpg", cnt), im0);
-    cv::imwrite(ssprintf("images/%03d-1.jpg", cnt), im1);
+    auto im0 = c.get_for_calibrate(0);
+    auto im1 = c.get_for_calibrate(1);
+    cv::imwrite(ssprintf("images/cam0/%05d-0.jpg", cnt), im0);
+    cv::imwrite(ssprintf("images/cam1/%05d-1.jpg", cnt), im1);
   }
   viewer.stop();
 

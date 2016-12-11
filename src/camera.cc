@@ -20,7 +20,7 @@ cv::Mat Camera::get_for_py(int i) const {
   m_assert(i < num_cameras);
   auto m = m_camera_buffer[i].read_new();
   // original size: 1600x1200
-  auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
+  static auto r = cv::Rect(ORIG_W*CROP_X0,ORIG_H*CROP_Y0,ORIG_W*CROP_W,ORIG_H*CROP_H);
   m = m(r);
   cv::resize(m, m, cv::Size(368,368));
   cv::transpose(m,m);
