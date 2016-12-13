@@ -123,7 +123,7 @@ if __name__ == '__main__':
     #np.save('all.npy', ret)
     # ------------
 
-    pts = np.load('../data/pm-pts.npy')
+    pts = np.load('../data/pm-pts-demo.npy')
     ret = []
     N = pts.shape[-1]
     for k in range(N):

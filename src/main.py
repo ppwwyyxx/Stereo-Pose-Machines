@@ -31,8 +31,7 @@ def test_cpp_viewer():
 def stereo_cpm_viewer():
     camera = libcpm.Camera()
     camera.setup()
-    #runner = get_parallel_runner('../data/cpm.npy')
-    runner, _ = get_runner('../data/cpm.npy')
+    runner = get_parallel_runner('../data/cpm.npy')
     cv2.namedWindow('color')
     cv2.startWindowThread()
     cnt = 0
@@ -43,9 +42,7 @@ def stereo_cpm_viewer():
         m2 = camera.get_for_py(1)
         m2 = np.array(m2, copy=False)
 
-        #o1, o2 = runner(m1, m2)
-        o1 = runner(m1)
-        o2 = runner(m2)
+        o1, o2 = runner(m1, m2)
 
         buf = dumps([m1, m2, o1, o2])
         f = open('recording/{:03d}.npy'.format(cnt), 'w')
@@ -100,11 +97,7 @@ def final():
     pmatcher = libcpm.PatchMatch()
     pmatcher.init(camera, 20)
 
-    #runner = get_parallel_runner('../data/cpm.npy')
-    runner, _ = get_runner('../data/cpm.npy')
-
-    #cv2.namedWindow('color')
-    #cv2.startWindowThread()
+    runner = get_parallel_runner('../data/cpm.npy')
 
     # python matcher:
     #bgs0, bgs1 = [], []
@@ -121,7 +114,7 @@ def final():
     viewer.start()
 
     C1, C0, d1, d0 = load_camera_from_calibr('../calibr-1211/camchain-homeyihuaDesktopCPM3D_kalibrfinal3.yaml')
-    queue = deque(maxlen=10)
+    queue = deque(maxlen=2)
 
     ctx = zmq.Context()
     sok = ctx.socket(zmq.PUSH)
@@ -134,7 +127,9 @@ def final():
         return np.asarray(out).reshape(14, 4) #14 x 2image x (x,y)
 
     pts3ds = []
+    cnt = 0
     while True:
+        cnt += 1
         print 'begin---', time.time()
         m1 = camera.get_for_py(0)
         m1r = np.array(m1, copy=False)
@@ -145,13 +140,16 @@ def final():
         m2s = cv2.resize(m2r, (368,368))
         print 'after resize---', time.time()
 
-        #o1, o2 = runner(m1, m2)
-        o1 = runner(m1s)
-        o2 = runner(m2s)
+        o1, o2 = runner(m1s, m2s)
         print 'after cpm---', time.time()
 
         #pts14x4 = matcher.match(m1r, m2r, o1, o2)
         pts14x4 = cpp_matcher(m1, m2, o1, o2)
+
+        to_save = (m1s, m2s, o1, o2, pts14x4)
+        fout = open('full-recording/{:04d}.dat'.format(cnt), 'wb')
+        fout.write(dumps(to_save))
+        fout.close()
 
         print 'after match---', time.time()
         queue.append(pts14x4)
