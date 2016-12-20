@@ -42,12 +42,15 @@ def stereo_cpm_viewer():
         m2 = camera.get_for_py(1)
         m2 = np.array(m2, copy=False)
 
-        o1, o2 = runner(m1, m2)
+	m1s = cv2.resize(m1, (368,368))
+	m2s = cv2.resize(m2, (368,368))
 
-        buf = dumps([m1, m2, o1, o2])
-        f = open('recording/{:03d}.npy'.format(cnt), 'w')
-        f.write(buf)
-        f.close()
+        o1, o2 = runner(m1s, m2s)
+
+        #buf = dumps([m1, m2, o1, o2])
+        #f = open('recording/{:03d}.npy'.format(cnt), 'w')
+        #f.write(buf)
+        #f.close()
 
         c1 = colorize(m1, o1[:,:,:-1].sum(axis=2))
         c2 = colorize(m2, o2[:,:,:-1].sum(axis=2))
@@ -117,8 +120,8 @@ def final():
     queue = deque(maxlen=2)
 
     ctx = zmq.Context()
-    sok = ctx.socket(zmq.PUSH)
-    sok.connect('tcp://172.22.45.86:8888')
+    #sok = ctx.socket(zmq.PUSH)
+    #sok.connect('tcp://172.22.45.86:8888')
 
     def cpp_matcher(m1, m2, o1, o2):
         o1 = libcpm.Mat(o1)
@@ -146,10 +149,10 @@ def final():
         #pts14x4 = matcher.match(m1r, m2r, o1, o2)
         pts14x4 = cpp_matcher(m1, m2, o1, o2)
 
-        to_save = (m1s, m2s, o1, o2, pts14x4)
-        fout = open('full-recording/{:04d}.dat'.format(cnt), 'wb')
-        fout.write(dumps(to_save))
-        fout.close()
+        #to_save = (m1s, m2s, o1, o2, pts14x4)
+        #fout = open('full-recording/{:04d}.dat'.format(cnt), 'wb')
+        #fout.write(dumps(to_save))
+        #fout.close()
 
         print 'after match---', time.time()
         queue.append(pts14x4)
@@ -158,7 +161,8 @@ def final():
         for c in range(14):
             p3d = triangulate(C0, C1, p2d[c,:2], p2d[c,2:])
             p3ds[c,:] = p3d
-        sok.send(dumps(p3ds))
+        #sok.send(dumps(p3ds))
+	print p3ds
         print 'after send---', time.time()
         print '-------'
 
