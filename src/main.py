@@ -42,8 +42,8 @@ def stereo_cpm_viewer():
         m2 = camera.get_for_py(1)
         m2 = np.array(m2, copy=False)
 
-	m1s = cv2.resize(m1, (368,368))
-	m2s = cv2.resize(m2, (368,368))
+        m1s = cv2.resize(m1, (368,368))
+        m2s = cv2.resize(m2, (368,368))
 
         o1, o2 = runner(m1s, m2s)
 
@@ -162,7 +162,7 @@ def final():
             p3d = triangulate(C0, C1, p2d[c,:2], p2d[c,2:])
             p3ds[c,:] = p3d
         #sok.send(dumps(p3ds))
-	print p3ds
+        print p3ds
         print 'after send---', time.time()
         print '-------'
 

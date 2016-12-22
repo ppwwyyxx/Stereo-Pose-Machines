@@ -42,7 +42,7 @@ OBJS = $(addprefix $(OBJ_DIR)/,$(ccSRCS:.cc=.o))
 MAIN_OBJ  := $(addprefix $(OBJ_DIR)/, $(MAIN_SRCS:.cpp=.o))
 DEPS = $(OBJS:.o=.d) $(MAIN_OBJ:.o=.d)
 BINS = $(MAIN_SRCS:.cpp=.bin)
-SO = libcpm.so
+SO = ../libcpm.so
 
 .PHONY: all clean run
 
