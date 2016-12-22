@@ -39,24 +39,11 @@ int main(int argc, char* argv[]) {
   int cnt = 0;
   while (true) {
     cnt ++;
-    /*
-     *auto im0 = c.get_for_calibrate(0);
-     *auto im1 = c.get_for_calibrate(1);
-     */
-     /*
-      *auto im0 = c.get_new(0);
-      *auto im1 = c.get_new(1);
-      */
-    auto im0 = c.get_for_py(0);
-    auto im1 = c.get_for_py(1);
-    im0 = matcher.segment(im0, matcher.bg0);
-    im1 = matcher.segment(im1, matcher.bg1);
-    auto viz = vconcat(im0, im1);
-    imshow("", viz);
-    /*
-     *cv::imwrite(ssprintf("images/cam0/%05d-0.jpg", cnt), im0);
-     *cv::imwrite(ssprintf("images/cam1/%05d-1.jpg", cnt), im1);
-     */
+    // for calibration
+    auto im0 = c.get_cropped(0);
+    auto im1 = c.get_cropped(1);
+    cv::imwrite(ssprintf("images/cam0/%05d00000000000000.jpg", cnt), im0);
+    cv::imwrite(ssprintf("images/cam1/%05d00000000000000.jpg", cnt), im1);
   }
   viewer.stop();
 

@@ -5,6 +5,7 @@
 
 import numpy as np
 import time
+import argparse
 import cv2
 import zmq
 import sys
@@ -82,25 +83,13 @@ def dump_2dcoor():
         if cnt == 10:
             break
 
-def capture_pair():
-    camera = libcpm.Camera()
-    camera.setup()
-    im1 = camera.get_new(0)
-    im1 = np.array(im1, copy=False)
-    im2 = camera.get_new(1)
-    im2 = np.array(im2, copy=False)
-    cv2.imwrite("1.png", im1)
-    cv2.imwrite("2.png", im2)
-
-
 def final():
     camera = libcpm.Camera()
     camera.setup()
 
+    # cpp matcher:
     pmatcher = libcpm.PatchMatch()
     pmatcher.init(camera, 20)
-
-    runner = get_parallel_runner('../data/cpm.npy')
 
     # python matcher:
     #bgs0, bgs1 = [], []
@@ -113,6 +102,9 @@ def final():
         #bgs1.append(m2)
     #matcher = Matcher(BackgroundSegmentor(bgs0), BackgroundSegmentor(bgs1))
 
+
+    runner = get_parallel_runner('../data/cpm.npy')
+
     viewer = libcpm.StereoCameraViewer(camera)
     viewer.start()
 
@@ -120,8 +112,8 @@ def final():
     queue = deque(maxlen=2)
 
     ctx = zmq.Context()
-    #sok = ctx.socket(zmq.PUSH)
-    #sok.connect('tcp://172.22.45.86:8888')
+    sok = ctx.socket(zmq.PUSH)
+    sok.connect('tcp://172.22.45.86:8888')
 
     def cpp_matcher(m1, m2, o1, o2):
         o1 = libcpm.Mat(o1)
@@ -161,22 +153,20 @@ def final():
         for c in range(14):
             p3d = triangulate(C0, C1, p2d[c,:2], p2d[c,2:])
             p3ds[c,:] = p3d
-        #sok.send(dumps(p3ds))
+        sok.send(dumps(p3ds))
         print p3ds
         print 'after send---', time.time()
-        print '-------'
-
-        #c1 = colorize(m1r, o1[:,:,:-1].sum(axis=2))
-        #c2 = colorize(m2r, o2[:,:,:-1].sum(axis=2))
-        #viz = np.concatenate((c1, c2), axis=1)
-        #cv2.imshow('color', viz / 255.0)
+        print '-----------------'
 
 if __name__ == '__main__':
-    final()
-
-    #test_viewer()
-    #stereo_cpm_viewer()
-    #dump_2dcoor()
-    #capture_pair()
-
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--task',
+            choices=['camera-viewer', 'cpm-viewer', 'cpm3d'],
+            default='cpm-viewer')
+    args = parser.parse_args()
+    if args.task == 'camera-viewer':
+        test_cpp_viewer()
+    elif args.task == 'cpm-viewer':
+        stereo_cpm_viewer()
+    else:
+        final()

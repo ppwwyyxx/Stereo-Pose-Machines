@@ -79,19 +79,20 @@ def run_app(draw_cb, get_frame_func):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print "Usage: {} <npy file with all 3d points>"
+        sys.exit(1)
     B = 600.0
     drawer = GLDrawer('winname', [(-B,B)]*3)
     drawer.start()
 
-    alldata = np.load('final-demo.npy')
-    print alldata.shape
+    alldata = np.load(sys.argv[1])
+    print "Shape:", alldata.shape
     cnt = 0
     def get_frame():
         global cnt
         cnt += 1
         step = cnt / 3
-        if step > alldata.shape[0]:
-            sys.exit()
         print step % alldata.shape[0]
         data = alldata[step%alldata.shape[0]] * 100
         spheres = [Sphere(3, pos) for pos in data]

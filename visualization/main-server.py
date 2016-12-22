@@ -22,6 +22,7 @@ if __name__ == '__main__':
 
     ctx = zmq.Context()
     sok = ctx.socket(zmq.PULL)
+    print 'Starting server at 0.0.0.0:8888 ...'
     sok.bind('tcp://0.0.0.0:8888')
     def get_frame():
         global cnt
