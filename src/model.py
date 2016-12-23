@@ -15,8 +15,7 @@ from tensorpack.tfutils.symbolic_functions import *
 from tensorpack.tfutils.summary import *
 import matplotlib.pyplot as plt
 
-__all__ = ['colorize', 'colorize_all',
-        'argmax_2d', 'argmean_2d']
+__all__ = ['colorize', 'colorize_all', 'argmax_2d', 'argmean_2d']
 
 _CM = plt.get_cmap('jet')
 def colorize(img, heatmap):

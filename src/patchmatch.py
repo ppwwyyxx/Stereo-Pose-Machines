@@ -47,10 +47,6 @@ def take_patch(im, y, x, size):
         IPython.embed(config=IPython.terminal.ipapp.load_default_config())
     return canvas
 
-def patch_match(small, large):
-    pass
-
-
 BG0 = None
 BG1 = None
 

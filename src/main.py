@@ -113,7 +113,8 @@ def final():
 
     ctx = zmq.Context()
     sok = ctx.socket(zmq.PUSH)
-    sok.connect('tcp://172.22.45.86:8888')
+    global args
+    sok.connect('tcp://{}:8888'.format(args.host))
 
     def cpp_matcher(m1, m2, o1, o2):
         o1 = libcpm.Mat(o1)
@@ -163,6 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--task',
             choices=['camera-viewer', 'cpm-viewer', 'cpm3d'],
             default='cpm-viewer')
+    parser.add_argument('-h', '--host', default='0.0.0.0')
     args = parser.parse_args()
     if args.task == 'camera-viewer':
         test_cpp_viewer()
