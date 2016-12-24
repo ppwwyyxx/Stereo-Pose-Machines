@@ -2,7 +2,7 @@
 
 ![demo](./demo/poster.jpg)
 
-[Video Demo](tbd)
+[Video Demo](https://www.youtube.com/watch?v=-BcL1aqEsjA)
 
 ## Dependencies:
 + A Pair of Pylon Cameras
