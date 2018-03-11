@@ -11,7 +11,6 @@ import os, argparse
 
 from tensorpack import *
 from tensorpack.utils.argtools import memoized
-from tensorpack.tfutils.symbolic_functions import *
 from tensorpack.tfutils.summary import *
 import matplotlib.pyplot as plt
 
@@ -122,7 +121,7 @@ def run_test(path, input):
     param_dict = np.load(path, encoding='latin1').item()
     predict_func = OfflinePredictor(PredictConfig(
         model=Model(),
-        session_init=ParamRestore(param_dict),
+        session_init=DictRestore(param_dict),
         input_names=['input'],
         output_names=['Mconv7_stage6/output']
     ))

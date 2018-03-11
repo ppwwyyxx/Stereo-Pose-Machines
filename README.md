@@ -2,7 +2,15 @@
 
 ![demo](./demo/poster.jpg)
 
+What it does:
+
+1. Compute 2D joints detected by CPM from stereo cameras
+2. Match the joints by guided patch-matching
+3. Triangulate the joints
+4. Build a 3D skeleton
+
 Check out our [Video Demo](https://www.youtube.com/watch?v=-BcL1aqEsjA) !
+The project is a course demo and is not maintained.
 
 ## Dependencies:
 + A pair of Pylon Cameras
@@ -31,7 +39,7 @@ Change the path in `main.py` to your own calibration results. Also change the un
 coefficients in `cpp/camera.hh`.
 
 ## Test CPM is working:
-Download model to `data/cpm.npy`. See [tensorpack CPM examples](https://github.com/ppwwyyxx/tensorpack/tree/master/examples/ConvolutionalPoseMachines) for instructions.
+Download model to `data/cpm.npy`. See [tensorpack CPM examples](https://github.com/ppwwyyxx/tensorpack/tree/master/examples/CaffeModels) for instructions.
 ```
 cd src/cpp && python2 main.py -t 'cpm-viewer'
 ```
