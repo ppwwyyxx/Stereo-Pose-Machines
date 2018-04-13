@@ -60,11 +60,10 @@ def get_gaussian_map():
     return gaussian_map.reshape((1,368,368,1))
 
 class Model(ModelDesc):
-    def _get_input_vars(self):
-        return [InputVar(tf.float32, (None, 368, 368, 3), 'input') ]
+    def inputs(self):
+        return [tf.placeholder(tf.float32, (None, 368, 368, 3), 'input') ]
 
-    def _build_graph(self, inputs):
-        image = inputs[0]
+    def build_graph(self, image):
         image = image / 256.0 - 0.5
         gmap = tf.constant(get_gaussian_map())
         gmap = tf.tile(gmap, tf.pack([tf.shape(image)[0], 1, 1, 1]))
