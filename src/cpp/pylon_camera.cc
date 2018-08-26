@@ -1,5 +1,5 @@
 //File: pylon_camera.cc
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include <iostream>
 #include <chrono>

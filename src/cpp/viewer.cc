@@ -1,5 +1,5 @@
 //File: viewer.cc
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include "viewer.hh"
 #include <string>

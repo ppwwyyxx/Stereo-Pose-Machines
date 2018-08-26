@@ -1,5 +1,5 @@
 // File: pybind.cc
-// Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include <pybind11/pybind11.h>
 

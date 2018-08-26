@@ -1,5 +1,5 @@
 //File: timer.hh
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #pragma once
 

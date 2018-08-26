@@ -1,5 +1,5 @@
 //File: viewer.hh
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #pragma once
 #include <atomic>

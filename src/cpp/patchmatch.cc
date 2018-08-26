@@ -1,5 +1,5 @@
 //File: patchmatch.cc
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include <iostream>
 #include "patchmatch.hh"

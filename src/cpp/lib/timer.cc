@@ -1,5 +1,5 @@
 //File: timer.cc
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include "timer.hh"
 #include "debugutils.hh"

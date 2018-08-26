@@ -1,5 +1,5 @@
 //File: main.cpp
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 #include <opencv2/highgui/highgui.hpp>
 #include <chrono>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # File: model.py
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 import cv2
 import tensorflow as tf
